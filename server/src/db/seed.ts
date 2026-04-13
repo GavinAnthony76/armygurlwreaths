@@ -63,15 +63,31 @@ async function seed() {
       },
     ]).onConflictDoNothing().returning();
 
-    // Add placeholder image data (real images added via admin)
+    // Placeholder images per seasonal product (primary + secondary for hover-swap)
+    const seasonalImages: Record<string, { primary: string; secondary: string }> = {
+      'autumn-harvest-wreath': {
+        primary: 'https://images.unsplash.com/photo-1508193638397-1c4234db14d8?w=800&q=80',
+        secondary: 'https://images.unsplash.com/photo-1567016376408-0226e4d0c1ea?w=800&q=80',
+      },
+      'winter-wonderland-wreath': {
+        primary: 'https://images.unsplash.com/photo-1512389142860-9c449e58a543?w=800&q=80',
+        secondary: 'https://images.unsplash.com/photo-1467810563316-b5476525c0f9?w=800&q=80',
+      },
+      'spring-bloom-wreath': {
+        primary: 'https://images.unsplash.com/photo-1459411552884-841db9b3cc2a?w=800&q=80',
+        secondary: 'https://images.unsplash.com/photo-1490750967868-88df5691cc4c?w=800&q=80',
+      },
+    };
+
     for (const product of insertedProducts) {
-      await db.insert(productImages).values({
-        productId: product.id,
-        url: `https://images.unsplash.com/photo-1467890947394-8171244e5410?w=800&q=80`,
-        altText: product.name,
-        isPrimary: true,
-        sortOrder: 0,
-      }).onConflictDoNothing();
+      const imgs = seasonalImages[product.slug] ?? {
+        primary: 'https://images.unsplash.com/photo-1467890947394-8171244e5410?w=800&q=80',
+        secondary: 'https://images.unsplash.com/photo-1543059080-f9b1272213d5?w=800&q=80',
+      };
+      await db.insert(productImages).values([
+        { productId: product.id, url: imgs.primary, altText: product.name, isPrimary: true, sortOrder: 0 },
+        { productId: product.id, url: imgs.secondary, altText: `${product.name} — detail view`, isPrimary: false, sortOrder: 1 },
+      ]).onConflictDoNothing();
     }
   }
 
@@ -114,14 +130,31 @@ async function seed() {
       },
     ]).onConflictDoNothing().returning();
 
+    // Placeholder images per patriotic product (primary + secondary for hover-swap)
+    const patrioticImages: Record<string, { primary: string; secondary: string }> = {
+      'stars-stripes-forever-wreath': {
+        primary: 'https://images.unsplash.com/photo-1621506289937-a8e4df240d0b?w=800&q=80',
+        secondary: 'https://images.unsplash.com/photo-1534430480872-3498386e7856?w=800&q=80',
+      },
+      'military-pride-wreath': {
+        primary: 'https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=800&q=80',
+        secondary: 'https://images.unsplash.com/photo-1551836022-deb4988cc6c0?w=800&q=80',
+      },
+      'gold-star-family-wreath': {
+        primary: 'https://images.unsplash.com/photo-1548248823-ce16a73b6d49?w=800&q=80',
+        secondary: 'https://images.unsplash.com/photo-1549490349-8643362247b5?w=800&q=80',
+      },
+    };
+
     for (const product of patrioticProducts) {
-      await db.insert(productImages).values({
-        productId: product.id,
-        url: `https://images.unsplash.com/photo-1621506289937-a8e4df240d0b?w=800&q=80`,
-        altText: product.name,
-        isPrimary: true,
-        sortOrder: 0,
-      }).onConflictDoNothing();
+      const imgs = patrioticImages[product.slug] ?? {
+        primary: 'https://images.unsplash.com/photo-1621506289937-a8e4df240d0b?w=800&q=80',
+        secondary: 'https://images.unsplash.com/photo-1534430480872-3498386e7856?w=800&q=80',
+      };
+      await db.insert(productImages).values([
+        { productId: product.id, url: imgs.primary, altText: product.name, isPrimary: true, sortOrder: 0 },
+        { productId: product.id, url: imgs.secondary, altText: `${product.name} — detail view`, isPrimary: false, sortOrder: 1 },
+      ]).onConflictDoNothing();
     }
   }
 
