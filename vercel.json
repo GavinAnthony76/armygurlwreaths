@@ -7,8 +7,6 @@
     { "source": "/((?!api/).*)", "destination": "/index.html" }
   ],
   "functions": {
-    "api/index.ts": {
-      "includeFiles": "server/src/**|packages/shared/dist/**"
-    }
+    "api/index.ts": {}
   }
 }
