@@ -23,4 +23,10 @@ export const checkoutController = {
     );
     res.json({ success: true, data: order });
   },
+
+  async createDemoOrder(req: Request, res: Response) {
+    const { shippingAddress, notes } = req.body;
+    const order = await checkoutService.createDemoOrder(req.user!.sub, shippingAddress, notes);
+    res.status(201).json({ success: true, data: order });
+  },
 };

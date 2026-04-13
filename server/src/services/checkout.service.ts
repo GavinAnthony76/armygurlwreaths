@@ -1,4 +1,4 @@
-import { eq } from 'drizzle-orm';
+import { eq, sql } from 'drizzle-orm';
 import { db } from '../config/db.js';
 import { stripe } from '../config/stripe.js';
 import { env } from '../config/env.js';
@@ -22,6 +22,18 @@ export const checkoutService = {
     const shippingCost = subtotal >= 7500 ? 0 : 895; // Free shipping over $75
     const total = subtotal + shippingCost;
 
+    // Demo mode — Stripe keys not configured
+    if (!stripe) {
+      return {
+        clientSecret: null,
+        paymentIntentId: null,
+        demoMode: true,
+        subtotal,
+        shippingCost,
+        total,
+      };
+    }
+
     const paymentIntent = await stripe.paymentIntents.create({
       amount: total,
       currency: 'usd',
@@ -35,10 +47,16 @@ export const checkoutService = {
     return {
       clientSecret: paymentIntent.client_secret,
       paymentIntentId: paymentIntent.id,
+      demoMode: false,
       subtotal,
       shippingCost,
       total,
     };
+  },
+
+  async createDemoOrder(userId: string, shippingAddress: ShippingAddressInput, notes?: string) {
+    const demoIntentId = `demo_${Date.now()}`;
+    return this.fulfillOrder(userId, demoIntentId, 'stripe', shippingAddress, notes);
   },
 
   async createPayPalOrder(userId: string) {
@@ -157,10 +175,13 @@ export const checkoutService = {
       }))
     );
 
-    // Decrement inventory
+    // Decrement inventory (floor at 0)
     for (const item of cart.items) {
       await db.update(products)
-        .set({ stockQty: eq(products.stockQty, item.quantity) ? 0 : undefined })
+        .set({
+          stockQty: sql`GREATEST(0, ${products.stockQty} - ${item.quantity})`,
+          updatedAt: new Date(),
+        })
         .where(eq(products.id, item.productId));
     }
 

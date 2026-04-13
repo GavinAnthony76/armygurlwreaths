@@ -26,12 +26,17 @@ export const productFiltersSchema = z.object({
   category: z.string().optional(),
   season: z.enum(seasons).optional(),
   tags: z.array(z.string()).optional(),
-  minPrice: z.number().int().min(0).optional(),
-  maxPrice: z.number().int().min(0).optional(),
-  isFeatured: z.boolean().optional(),
+  // Use coerce so string query params ("1", "30000") are cast to numbers automatically
+  minPrice: z.coerce.number().int().min(0).optional(),
+  maxPrice: z.coerce.number().int().min(0).optional(),
+  // Boolean query params arrive as "true"/"false" strings
+  isFeatured: z.union([
+    z.boolean(),
+    z.string().transform((v) => v === 'true'),
+  ]).optional(),
   search: z.string().max(100).optional(),
-  page: z.number().int().min(1).default(1),
-  pageSize: z.number().int().min(1).max(100).default(20),
+  page: z.coerce.number().int().min(1).default(1),
+  pageSize: z.coerce.number().int().min(1).max(100).default(20),
   sortBy: z.enum(['price_asc', 'price_desc', 'newest', 'name']).default('newest'),
 });
 

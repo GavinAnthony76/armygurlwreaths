@@ -1,12 +1,12 @@
 import { useState, useEffect } from 'react';
-import { useParams, useSearchParams, useNavigate } from 'react-router-dom';
+import { useParams, useSearchParams } from 'react-router-dom';
 import { useQuery } from '@tanstack/react-query';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Filter, SlidersHorizontal, X, ChevronDown } from 'lucide-react';
 import api from '../lib/api';
 import ProductCard from '../components/product/ProductCard';
 import { fadeUp, staggerContainer, pageTransition } from '../design-system/motion';
-import type { Product, ProductListResponse } from '@armygurl/shared';
+import type { ProductListResponse } from '@armygurl/shared';
 import { formatPrice } from '../lib/formatters';
 
 const SORT_OPTIONS = [
@@ -87,6 +87,114 @@ export default function Shop() {
           )}
         </div>
       </div>
+
+      {/* Mobile filter drawer */}
+      <AnimatePresence>
+        {mobileFiltersOpen && (
+          <>
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              className="fixed inset-0 z-40 bg-slate-900/50 backdrop-blur-sm lg:hidden"
+              onClick={() => setMobileFiltersOpen(false)}
+            />
+            <motion.aside
+              initial={{ x: '-100%' }}
+              animate={{ x: 0 }}
+              exit={{ x: '-100%' }}
+              transition={{ type: 'tween', duration: 0.25 }}
+              className="fixed inset-y-0 left-0 z-50 w-80 max-w-[85vw] bg-white shadow-modal overflow-y-auto lg:hidden"
+            >
+              <div className="flex items-center justify-between p-4 border-b border-cream-200">
+                <h2 className="font-heading font-semibold text-slate-900">Filters</h2>
+                <button
+                  onClick={() => setMobileFiltersOpen(false)}
+                  className="w-8 h-8 rounded-full bg-cream-100 flex items-center justify-center"
+                  aria-label="Close filters"
+                >
+                  <X className="w-4 h-4 text-slate-600" />
+                </button>
+              </div>
+              <div className="p-4 space-y-6">
+                <FilterSection title="Collections">
+                  <div className="space-y-2">
+                    {CATEGORIES.map((cat) => (
+                      <label key={cat.value} className="flex items-center gap-2 cursor-pointer group">
+                        <input
+                          type="radio"
+                          name="mobile-category"
+                          value={cat.value}
+                          checked={filters.category === cat.value}
+                          onChange={() => { updateFilter('category', cat.value); }}
+                          className="accent-olive-500"
+                        />
+                        <span className={`text-sm transition-colors ${filters.category === cat.value ? 'text-olive-600 font-medium' : 'text-slate-600 group-hover:text-olive-500'}`}>
+                          {cat.label}
+                        </span>
+                      </label>
+                    ))}
+                  </div>
+                </FilterSection>
+
+                <FilterSection title="Season">
+                  <div className="space-y-2">
+                    {SEASONS.map((s) => (
+                      <label key={s.value} className="flex items-center gap-2 cursor-pointer group">
+                        <input
+                          type="radio"
+                          name="mobile-season"
+                          value={s.value}
+                          checked={filters.season === s.value}
+                          onChange={() => { updateFilter('season', s.value); }}
+                          className="accent-olive-500"
+                        />
+                        <span className={`text-sm transition-colors ${filters.season === s.value ? 'text-olive-600 font-medium' : 'text-slate-600 group-hover:text-olive-500'}`}>
+                          {s.label}
+                        </span>
+                      </label>
+                    ))}
+                  </div>
+                </FilterSection>
+
+                <FilterSection title="Price Range">
+                  <div className="space-y-3">
+                    <div className="flex items-center justify-between text-sm text-slate-600">
+                      <span>{formatPrice(filters.minPrice)}</span>
+                      <span>{filters.maxPrice >= 30000 ? 'Any' : formatPrice(filters.maxPrice)}</span>
+                    </div>
+                    <input
+                      type="range"
+                      min={0}
+                      max={30000}
+                      step={500}
+                      value={filters.maxPrice}
+                      onChange={(e) => updateFilter('maxPrice', Number(e.target.value))}
+                      className="w-full accent-olive-500"
+                    />
+                  </div>
+                </FilterSection>
+
+                {(filters.category || filters.season) && (
+                  <button
+                    onClick={() => { setFilters((f) => ({ ...f, category: '', season: '', page: 1 })); setMobileFiltersOpen(false); }}
+                    className="text-sm text-crimson-600 hover:text-crimson-700 flex items-center gap-1"
+                  >
+                    <X className="w-3.5 h-3.5" /> Clear filters
+                  </button>
+                )}
+
+                <button
+                  onClick={() => setMobileFiltersOpen(false)}
+                  className="btn-primary w-full"
+                >
+                  Apply Filters
+                </button>
+              </div>
+            </motion.aside>
+          </>
+        )}
+      </AnimatePresence>
 
       <div className="container mx-auto max-w-7xl py-8">
         <div className="flex gap-8">

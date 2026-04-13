@@ -8,6 +8,7 @@ const router = Router();
 
 router.use(authenticate, checkoutLimiter);
 router.post('/intent', asyncHandler(checkoutController.createStripeIntent));
+router.post('/demo', asyncHandler(checkoutController.createDemoOrder));
 router.post('/paypal/create', asyncHandler(checkoutController.createPayPalOrder));
 router.post('/paypal/capture', asyncHandler(checkoutController.capturePayPalOrder));
 

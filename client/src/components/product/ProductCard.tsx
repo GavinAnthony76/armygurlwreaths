@@ -17,6 +17,7 @@ interface ProductCardProps {
 export default function ProductCard({ product, className }: ProductCardProps) {
   const [wishlist, setWishlist] = useState(false);
   const [imageLoaded, setImageLoaded] = useState(false);
+  const [imageError, setImageError] = useState(false);
   const addItem = useCartStore((s) => s.addItem);
 
   const primaryImage = product.images.find((img) => img.isPrimary) ?? product.images[0];
@@ -61,7 +62,7 @@ export default function ProductCard({ product, className }: ProductCardProps) {
           {/* Image container */}
           <div className="product-image relative">
             {/* Primary image */}
-            {primaryImage && (
+            {primaryImage && !imageError ? (
               <img
                 src={primaryImage.url}
                 alt={primaryImage.altText ?? product.name}
@@ -71,11 +72,19 @@ export default function ProductCard({ product, className }: ProductCardProps) {
                   imageLoaded ? 'opacity-100' : 'opacity-0'
                 )}
                 onLoad={() => setImageLoaded(true)}
+                onError={() => { setImageError(true); setImageLoaded(true); }}
                 loading="lazy"
               />
-            )}
+            ) : imageError ? (
+              <div className="absolute inset-0 flex flex-col items-center justify-center bg-cream-100 text-slate-400 gap-2">
+                <div className="w-12 h-12 rounded-full bg-cream-200 flex items-center justify-center">
+                  <ShoppingBag className="w-6 h-6" />
+                </div>
+                <span className="text-xs text-center px-4">{product.name}</span>
+              </div>
+            ) : null}
             {/* Secondary image on hover */}
-            {secondaryImage && (
+            {secondaryImage && !imageError && (
               <img
                 src={secondaryImage.url}
                 alt={secondaryImage.altText ?? product.name}
@@ -83,7 +92,7 @@ export default function ProductCard({ product, className }: ProductCardProps) {
                 loading="lazy"
               />
             )}
-            {!imageLoaded && (
+            {!imageLoaded && !imageError && (
               <div className="absolute inset-0 skeleton" />
             )}
 
@@ -111,20 +120,20 @@ export default function ProductCard({ product, className }: ProductCardProps) {
               )}
             </div>
 
-            {/* Wishlist */}
+            {/* Wishlist — always visible on touch/mobile, hover-only on desktop */}
             <button
               onClick={(e) => { e.preventDefault(); setWishlist(!wishlist); }}
-              className="absolute top-3 right-3 w-8 h-8 rounded-full bg-white/90 backdrop-blur-sm shadow flex items-center justify-center opacity-0 group-hover:opacity-100 transition-all duration-200 hover:scale-110"
+              className="absolute top-3 right-3 w-9 h-9 rounded-full bg-white/90 backdrop-blur-sm shadow flex items-center justify-center transition-all duration-200 hover:scale-110 opacity-100 sm:opacity-0 sm:group-hover:opacity-100"
               aria-label="Add to wishlist"
             >
               <Heart className={cn('w-4 h-4 transition-colors', wishlist ? 'fill-crimson-500 text-crimson-500' : 'text-slate-600')} />
             </button>
 
-            {/* Quick add */}
+            {/* Quick add — always visible on touch/mobile, hover reveal on desktop */}
             {product.stockQty > 0 && (
               <motion.button
                 onClick={handleAddToCart}
-                className="absolute bottom-3 left-3 right-3 bg-olive-500 hover:bg-olive-600 text-white text-xs font-medium py-2.5 rounded-lg flex items-center justify-center gap-1.5 opacity-0 group-hover:opacity-100 translate-y-2 group-hover:translate-y-0 transition-all duration-200 shadow-card"
+                className="absolute bottom-3 left-3 right-3 bg-olive-500 hover:bg-olive-600 active:bg-olive-700 text-white text-xs font-medium py-3 rounded-lg flex items-center justify-center gap-1.5 transition-all duration-200 shadow-card opacity-100 sm:opacity-0 sm:group-hover:opacity-100 sm:translate-y-2 sm:group-hover:translate-y-0"
               >
                 <ShoppingBag className="w-3.5 h-3.5" />
                 Quick Add
