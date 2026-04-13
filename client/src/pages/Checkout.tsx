@@ -15,7 +15,9 @@ import { Shield, Lock, Truck } from 'lucide-react';
 import { toast } from 'sonner';
 import type { ShippingAddressInput } from '@armygurl/shared';
 
-const stripePromise = loadStripe(import.meta.env.VITE_STRIPE_PUBLISHABLE_KEY ?? '');
+const stripePromise = import.meta.env.VITE_STRIPE_PUBLISHABLE_KEY
+  ? loadStripe(import.meta.env.VITE_STRIPE_PUBLISHABLE_KEY)
+  : null;
 
 export default function Checkout() {
   const { items } = useCartStore();
