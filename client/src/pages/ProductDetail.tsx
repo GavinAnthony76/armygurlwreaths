@@ -102,7 +102,7 @@ export default function ProductDetail() {
                 initial={{ opacity: 0, scale: 1.05 }}
                 animate={{ opacity: 1, scale: 1 }}
                 transition={{ duration: 0.4 }}
-                src={primaryImage?.url ?? 'https://images.unsplash.com/photo-1467890947394-8171244e5410?w=800&q=80'}
+                src={primaryImage?.url ?? 'https://placehold.co/800x800/8b7f50/fdfcf7?text=Product+Image'}
                 alt={primaryImage?.altText ?? product.name}
                 className="w-full h-full object-cover"
               />

@@ -66,23 +66,23 @@ async function seed() {
     // Placeholder images per seasonal product (primary + secondary for hover-swap)
     const seasonalImages: Record<string, { primary: string; secondary: string }> = {
       'autumn-harvest-wreath': {
-        primary: 'https://images.unsplash.com/photo-1508193638397-1c4234db14d8?w=800&q=80',
-        secondary: 'https://images.unsplash.com/photo-1567016376408-0226e4d0c1ea?w=800&q=80',
+        primary: 'https://placehold.co/800x800/8b7f50/fdfcf7?text=Autumn+Harvest+Wreath',
+        secondary: 'https://placehold.co/800x800/b8891e/fdfcf7?text=Autumn+Harvest%0ADetail+View',
       },
       'winter-wonderland-wreath': {
-        primary: 'https://images.unsplash.com/photo-1512389142860-9c449e58a543?w=800&q=80',
-        secondary: 'https://images.unsplash.com/photo-1467810563316-b5476525c0f9?w=800&q=80',
+        primary: 'https://placehold.co/800x800/1e293b/fdfcf7?text=Winter+Wonderland+Wreath',
+        secondary: 'https://placehold.co/800x800/334155/fdfcf7?text=Winter+Wonderland%0ADetail+View',
       },
       'spring-bloom-wreath': {
-        primary: 'https://images.unsplash.com/photo-1459411552884-841db9b3cc2a?w=800&q=80',
-        secondary: 'https://images.unsplash.com/photo-1490750967868-88df5691cc4c?w=800&q=80',
+        primary: 'https://placehold.co/800x800/4a7c59/fdfcf7?text=Spring+Bloom+Wreath',
+        secondary: 'https://placehold.co/800x800/6b9e79/fdfcf7?text=Spring+Bloom%0ADetail+View',
       },
     };
 
     for (const product of insertedProducts) {
       const imgs = seasonalImages[product.slug] ?? {
-        primary: 'https://images.unsplash.com/photo-1467890947394-8171244e5410?w=800&q=80',
-        secondary: 'https://images.unsplash.com/photo-1543059080-f9b1272213d5?w=800&q=80',
+        primary: 'https://placehold.co/800x800/8b7f50/fdfcf7?text=Seasonal+Wreath',
+        secondary: 'https://placehold.co/800x800/b8891e/fdfcf7?text=Seasonal+Wreath%0ADetail+View',
       };
       await db.insert(productImages).values([
         { productId: product.id, url: imgs.primary, altText: product.name, isPrimary: true, sortOrder: 0 },
@@ -133,23 +133,23 @@ async function seed() {
     // Placeholder images per patriotic product (primary + secondary for hover-swap)
     const patrioticImages: Record<string, { primary: string; secondary: string }> = {
       'stars-stripes-forever-wreath': {
-        primary: 'https://images.unsplash.com/photo-1621506289937-a8e4df240d0b?w=800&q=80',
-        secondary: 'https://images.unsplash.com/photo-1534430480872-3498386e7856?w=800&q=80',
+        primary: 'https://placehold.co/800x800/c8373a/fdfcf7?text=Stars+%26+Stripes+Forever',
+        secondary: 'https://placehold.co/800x800/1e3a8a/fdfcf7?text=Stars+%26+Stripes%0ADetail+View',
       },
       'military-pride-wreath': {
-        primary: 'https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=800&q=80',
-        secondary: 'https://images.unsplash.com/photo-1551836022-deb4988cc6c0?w=800&q=80',
+        primary: 'https://placehold.co/800x800/4b5320/fdfcf7?text=Military+Pride+Wreath',
+        secondary: 'https://placehold.co/800x800/6b7a2f/fdfcf7?text=Military+Pride%0ADetail+View',
       },
       'gold-star-family-wreath': {
-        primary: 'https://images.unsplash.com/photo-1548248823-ce16a73b6d49?w=800&q=80',
-        secondary: 'https://images.unsplash.com/photo-1549490349-8643362247b5?w=800&q=80',
+        primary: 'https://placehold.co/800x800/b8891e/fdfcf7?text=Gold+Star+Family+Wreath',
+        secondary: 'https://placehold.co/800x800/d4a825/1e293b?text=Gold+Star+Family%0ADetail+View',
       },
     };
 
     for (const product of patrioticProducts) {
       const imgs = patrioticImages[product.slug] ?? {
-        primary: 'https://images.unsplash.com/photo-1621506289937-a8e4df240d0b?w=800&q=80',
-        secondary: 'https://images.unsplash.com/photo-1534430480872-3498386e7856?w=800&q=80',
+        primary: 'https://placehold.co/800x800/c8373a/fdfcf7?text=Patriotic+Wreath',
+        secondary: 'https://placehold.co/800x800/1e3a8a/fdfcf7?text=Patriotic+Wreath%0ADetail+View',
       };
       await db.insert(productImages).values([
         { productId: product.id, url: imgs.primary, altText: product.name, isPrimary: true, sortOrder: 0 },

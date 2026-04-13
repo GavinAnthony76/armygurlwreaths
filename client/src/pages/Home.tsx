@@ -46,7 +46,7 @@ export default function Home() {
           <div
             className="w-full h-full bg-cover bg-center bg-no-repeat"
             style={{
-              backgroundImage: `url('https://images.unsplash.com/photo-1607344645866-009c320b63e0?w=1920&q=85')`,
+              backgroundImage: `url('https://placehold.co/1920x1080/1e293b/fdfcf7?text=ArmyGurlWreaths')`,
             }}
           />
           <div className="absolute inset-0 bg-hero-gradient" />
@@ -165,10 +165,10 @@ export default function Home() {
           {/* Collection cards */}
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
             {[
-              { name: 'Seasonal', slug: 'seasonal', image: 'https://images.unsplash.com/photo-1467890947394-8171244e5410?w=600&q=80', desc: 'Spring, Summer, Fall & Winter' },
-              { name: 'Patriotic', slug: 'patriotic', image: 'https://images.unsplash.com/photo-1621506289937-a8e4df240d0b?w=600&q=80', desc: 'Military & American Pride' },
-              { name: 'Everyday', slug: 'everyday', image: 'https://images.unsplash.com/photo-1559181567-c3190ca9be46?w=600&q=80', desc: 'Year-round classic beauty' },
-              { name: 'Custom', slug: 'custom', image: 'https://images.unsplash.com/photo-1543059080-f9b1272213d5?w=600&q=80', desc: 'Made just for you' },
+              { name: 'Seasonal', slug: 'seasonal', image: 'https://placehold.co/600x800/8b7f50/fdfcf7?text=Seasonal+Collection', desc: 'Spring, Summer, Fall & Winter' },
+              { name: 'Patriotic', slug: 'patriotic', image: 'https://placehold.co/600x800/c8373a/fdfcf7?text=Patriotic+Collection', desc: 'Military & American Pride' },
+              { name: 'Everyday', slug: 'everyday', image: 'https://placehold.co/600x800/b8891e/fdfcf7?text=Everyday+Collection', desc: 'Year-round classic beauty' },
+              { name: 'Custom', slug: 'custom', image: 'https://placehold.co/600x800/1e293b/fdfcf7?text=Custom+Orders', desc: 'Made just for you' },
             ].map((col, i) => (
               <motion.div
                 key={col.name}
@@ -255,7 +255,7 @@ export default function Home() {
             >
               <div className="relative rounded-2xl overflow-hidden shadow-modal" style={{ aspectRatio: '4/5' }}>
                 <img
-                  src="https://images.unsplash.com/photo-1584464491033-06628f3a6b7b?w=800&q=80"
+                  src="https://placehold.co/800x1000/8b7f50/fdfcf7?text=Our+Story"
                   alt="Handcrafting a wreath"
                   className="w-full h-full object-cover"
                   loading="lazy"
