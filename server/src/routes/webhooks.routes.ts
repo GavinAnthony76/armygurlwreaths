@@ -13,6 +13,11 @@ const router = Router();
 router.post(
   '/stripe',
   asyncHandler(async (req: Request, res: Response) => {
+    if (!stripe || !env.STRIPE_WEBHOOK_SECRET) {
+      res.status(503).json({ error: 'Stripe is not configured' });
+      return;
+    }
+
     const sig = req.headers['stripe-signature'] as string;
     if (!sig) {
       res.status(400).json({ error: 'Missing stripe-signature header' });
