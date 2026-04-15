@@ -9,17 +9,22 @@ import { asyncHandler } from '../utils/asyncHandler.js';
 
 const router = Router();
 
-router.get('/active', asyncHandler(async (_req: Request, res: Response) => {
-  const now = new Date();
-  const active = await db.query.announcements.findMany({
-    where: and(
-      eq(announcements.isActive, true),
-      or(isNull(announcements.startsAt), lte(announcements.startsAt, now)),
-      or(isNull(announcements.endsAt), gte(announcements.endsAt, now))
-    ),
-  });
-  res.json({ success: true, data: active });
-}));
+router.get('/active', async (_req: Request, res: Response) => {
+  try {
+    const now = new Date();
+    const active = await db.query.announcements.findMany({
+      where: and(
+        eq(announcements.isActive, true),
+        or(isNull(announcements.startsAt), lte(announcements.startsAt, now)),
+        or(isNull(announcements.endsAt), gte(announcements.endsAt, now))
+      ),
+    });
+    res.json({ success: true, data: active });
+  } catch (err) {
+    console.error('[announcements.active]', err);
+    res.json({ success: true, data: [] });
+  }
+});
 
 router.get('/', authenticate, requireAdmin, asyncHandler(async (_req: Request, res: Response) => {
   const all = await db.query.announcements.findMany();

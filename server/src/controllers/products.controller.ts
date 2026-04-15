@@ -3,13 +3,23 @@ import { productService } from '../services/product.service.js';
 
 export const productsController = {
   async list(req: Request, res: Response) {
-    const result = await productService.list(req.query as never);
-    res.json({ success: true, data: result });
+    try {
+      const result = await productService.list(req.query as never);
+      res.json({ success: true, data: result });
+    } catch (err) {
+      console.error('[products.list]', err);
+      res.json({ success: true, data: { products: [], total: 0, page: 1, pageSize: 20, totalPages: 0 } });
+    }
   },
 
   async featured(_req: Request, res: Response) {
-    const products = await productService.getFeatured();
-    res.json({ success: true, data: products });
+    try {
+      const products = await productService.getFeatured();
+      res.json({ success: true, data: products });
+    } catch (err) {
+      console.error('[products.featured]', err);
+      res.json({ success: true, data: [] });
+    }
   },
 
   async getBySlug(req: Request, res: Response) {
@@ -18,9 +28,13 @@ export const productsController = {
   },
 
   async related(req: Request, res: Response) {
-    const product = await productService.getById(req.params.id);
-    const related = await productService.getRelated(product.id, product.categoryId);
-    res.json({ success: true, data: related });
+    try {
+      const product = await productService.getById(req.params.id);
+      const related = await productService.getRelated(product.id, product.categoryId);
+      res.json({ success: true, data: related });
+    } catch {
+      res.json({ success: true, data: [] });
+    }
   },
 
   async create(req: Request, res: Response) {

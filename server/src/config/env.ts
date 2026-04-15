@@ -29,9 +29,12 @@ const envSchema = z.object({
 const _env = envSchema.safeParse(process.env);
 
 if (!_env.success) {
-  console.error('❌ Invalid environment variables:');
-  console.error(_env.error.flatten().fieldErrors);
-  process.exit(1);
+  const errors = _env.error.flatten().fieldErrors;
+  const message = `❌ Invalid environment variables:\n${JSON.stringify(errors, null, 2)}`;
+  console.error(message);
+  // Throw instead of process.exit so Vercel serverless captures a real error
+  // rather than a FUNCTION_INVOCATION_FAILED with no log output.
+  throw new Error(message);
 }
 
 export const env = _env.data;
