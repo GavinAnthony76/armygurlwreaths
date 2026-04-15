@@ -8,7 +8,11 @@ export const ordersController = {
   },
 
   async getOrder(req: Request, res: Response) {
-    const order = await orderService.getById(req.params.id, req.user!.sub);
+    const id = req.params.id;
+    const isUuid = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(id);
+    const order = isUuid
+      ? await orderService.getById(id, req.user!.sub)
+      : await orderService.getByOrderNumber(id, req.user!.sub);
     res.json({ success: true, data: order });
   },
 

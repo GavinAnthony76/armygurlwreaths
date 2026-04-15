@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { X } from 'lucide-react';
@@ -23,6 +23,7 @@ export default function ProductFormModal({ product, onClose, onSuccess }: Props)
 
   const [primaryImageUrl, setPrimaryImageUrl] = useState(primaryImg?.url ?? '');
   const [secondaryImageUrl, setSecondaryImageUrl] = useState(secondaryImg?.url ?? '');
+  const [tagsInput, setTagsInput] = useState(product?.tags?.join(', ') ?? '');
   const isEdit = !!product;
 
   const { data: categories = [] } = useQuery<Category[]>({
@@ -30,39 +31,31 @@ export default function ProductFormModal({ product, onClose, onSuccess }: Props)
     queryFn: () => api.get('/categories').then((r) => r.data.data),
   });
 
-  const { register, handleSubmit, formState: { errors, isSubmitting } } = useForm<CreateProductInput>({
+  const { register, handleSubmit, reset, formState: { errors, isSubmitting } } = useForm<CreateProductInput>({
     resolver: zodResolver(createProductSchema),
-    defaultValues: product ? {
-      name: product.name,
-      description: product.description,
-      price: product.price,
-      compareAtPrice: product.compareAtPrice ?? undefined,
-      stockQty: product.stockQty,
-      lowStockThreshold: product.lowStockThreshold,
-      categoryId: product.category?.id ?? undefined,
-      isFeatured: product.isFeatured,
-      isActive: product.isActive,
-      isCustomizable: product.isCustomizable,
-      tags: product.tags,
-      season: product.season ?? undefined,
-    } : {
-      isActive: true,
-      isFeatured: false,
-      isCustomizable: false,
-      stockQty: 0,
-      lowStockThreshold: 3,
-      tags: [],
-    },
+    defaultValues: getDefaults(product),
   });
 
+  useEffect(() => {
+    reset(getDefaults(product));
+    setPrimaryImageUrl(primaryImg?.url ?? '');
+    setSecondaryImageUrl(secondaryImg?.url ?? '');
+    setTagsInput(product?.tags?.join(', ') ?? '');
+  }, [product?.id]);
+
   const onSubmit = async (data: CreateProductInput) => {
+    if (data.categoryId === '') {
+      data.categoryId = undefined;
+    }
+
+    data.tags = tagsInput ? tagsInput.split(',').map((t) => t.trim()).filter(Boolean) : [];
+
     try {
       let productId = product?.id;
 
       if (isEdit) {
         await api.patch(`/products/${productId}`, data);
 
-        // Sync images: delete existing then re-add
         if (primaryImageUrl || secondaryImageUrl) {
           for (const img of product.images) {
             await api.delete(`/products/${productId}/images/${img.id}`).catch(() => {});
@@ -110,32 +103,33 @@ export default function ProductFormModal({ product, onClose, onSuccess }: Props)
         </div>
 
         <form onSubmit={handleSubmit(onSubmit)} className="p-6 space-y-4">
-          {/* Name */}
           <div>
             <label className="block text-sm font-medium text-slate-300 mb-1.5">Product Name *</label>
             <input {...register('name')} className="admin-input" placeholder="Autumn Harvest Wreath" />
             {errors.name && <p className="text-xs text-red-400 mt-1">{errors.name.message}</p>}
           </div>
 
-          {/* Description */}
           <div>
             <label className="block text-sm font-medium text-slate-300 mb-1.5">Description *</label>
             <textarea {...register('description')} className="admin-input resize-none" rows={3} placeholder="Describe your wreath..." />
             {errors.description && <p className="text-xs text-red-400 mt-1">{errors.description.message}</p>}
           </div>
 
-          {/* Category */}
+          <div>
+            <label className="block text-sm font-medium text-slate-300 mb-1.5">SKU</label>
+            <input {...register('sku')} className="admin-input" placeholder="AGW-001" />
+          </div>
+
           <div>
             <label className="block text-sm font-medium text-slate-300 mb-1.5">Category</label>
             <select {...register('categoryId')} className="admin-input">
-              <option value="">— No category —</option>
+              <option value="">--- No category ---</option>
               {categories.map((cat) => (
                 <option key={cat.id} value={cat.id}>{cat.name}</option>
               ))}
             </select>
           </div>
 
-          {/* Price — inputs are in dollars; setValueAs converts to cents for the API */}
           <div className="grid grid-cols-2 gap-4">
             <div>
               <label className="block text-sm font-medium text-slate-300 mb-1.5">Price (USD) *</label>
@@ -170,7 +164,6 @@ export default function ProductFormModal({ product, onClose, onSuccess }: Props)
             </div>
           </div>
 
-          {/* Stock */}
           <div className="grid grid-cols-2 gap-4">
             <div>
               <label className="block text-sm font-medium text-slate-300 mb-1.5">Stock Qty</label>
@@ -182,11 +175,10 @@ export default function ProductFormModal({ product, onClose, onSuccess }: Props)
             </div>
           </div>
 
-          {/* Season */}
           <div>
             <label className="block text-sm font-medium text-slate-300 mb-1.5">Season</label>
             <select {...register('season')} className="admin-input">
-              <option value="">— None —</option>
+              <option value="">--- None ---</option>
               <option value="spring">Spring</option>
               <option value="summer">Summer</option>
               <option value="fall">Fall</option>
@@ -195,7 +187,16 @@ export default function ProductFormModal({ product, onClose, onSuccess }: Props)
             </select>
           </div>
 
-          {/* Images */}
+          <div>
+            <label className="block text-sm font-medium text-slate-300 mb-1.5">Tags <span className="text-slate-500 font-normal">(comma separated)</span></label>
+            <input
+              value={tagsInput}
+              onChange={(e) => setTagsInput(e.target.value)}
+              className="admin-input"
+              placeholder="military, patriotic, holiday"
+            />
+          </div>
+
           <div className="space-y-3">
             <div>
               <label className="block text-sm font-medium text-slate-300 mb-1.5">Primary Image URL</label>
@@ -223,7 +224,6 @@ export default function ProductFormModal({ product, onClose, onSuccess }: Props)
             </div>
           </div>
 
-          {/* Toggles */}
           <div className="flex flex-wrap gap-4">
             {[
               { name: 'isActive', label: 'Active' },
@@ -253,4 +253,32 @@ export default function ProductFormModal({ product, onClose, onSuccess }: Props)
       </motion.div>
     </div>
   );
+}
+
+function getDefaults(product: Product | null): Partial<CreateProductInput> {
+  if (!product) {
+    return {
+      isActive: true,
+      isFeatured: false,
+      isCustomizable: false,
+      stockQty: 0,
+      lowStockThreshold: 3,
+      tags: [],
+    };
+  }
+  return {
+    name: product.name,
+    description: product.description,
+    price: product.price,
+    compareAtPrice: product.compareAtPrice ?? undefined,
+    sku: product.sku ?? undefined,
+    stockQty: product.stockQty,
+    lowStockThreshold: product.lowStockThreshold,
+    categoryId: product.category?.id ?? undefined,
+    isFeatured: product.isFeatured,
+    isActive: product.isActive,
+    isCustomizable: product.isCustomizable,
+    tags: product.tags,
+    season: product.season ?? undefined,
+  };
 }

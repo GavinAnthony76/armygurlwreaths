@@ -1,7 +1,6 @@
 import { useState } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { motion } from 'framer-motion';
-import { Plus, Pencil, Trash2, Eye, EyeOff, Star } from 'lucide-react';
+import { Plus, Pencil, Trash2, Star, Eye, EyeOff } from 'lucide-react';
 import api from '../../lib/api';
 import { formatPrice, formatDate } from '../../lib/formatters';
 import type { Product } from '@armygurl/shared';
@@ -13,9 +12,9 @@ export default function AdminProducts() {
   const [editProduct, setEditProduct] = useState<Product | null>(null);
   const queryClient = useQueryClient();
 
-  const { data, isLoading } = useQuery({
+  const { data, isLoading, error } = useQuery({
     queryKey: ['admin', 'products'],
-    queryFn: () => api.get('/products?pageSize=100&isActive=true').then((r) => r.data.data.products as Product[]),
+    queryFn: () => api.get('/products?pageSize=100').then((r) => r.data.data.products as Product[]),
   });
 
   const deleteMut = useMutation({
@@ -27,6 +26,12 @@ export default function AdminProducts() {
     mutationFn: ({ id, isFeatured }: { id: string; isFeatured: boolean }) =>
       api.patch(`/products/${id}`, { isFeatured }),
     onSuccess: () => queryClient.invalidateQueries({ queryKey: ['admin', 'products'] }),
+  });
+
+  const toggleActive = useMutation({
+    mutationFn: ({ id, isActive }: { id: string; isActive: boolean }) =>
+      api.patch(`/products/${id}`, { isActive }),
+    onSuccess: () => { queryClient.invalidateQueries({ queryKey: ['admin', 'products'] }); toast.success('Product visibility updated'); },
   });
 
   return (
@@ -41,7 +46,11 @@ export default function AdminProducts() {
         </button>
       </div>
 
-      {isLoading ? (
+      {error ? (
+        <div className="bg-red-900/30 border border-red-800 rounded-xl p-6 text-center">
+          <p className="text-red-400 text-sm">Failed to load products. Please try again.</p>
+        </div>
+      ) : isLoading ? (
         <div className="space-y-3">
           {[...Array(5)].map((_, i) => <div key={i} className="h-16 bg-slate-900 rounded-xl border border-slate-800 animate-pulse" />)}
         </div>
@@ -54,6 +63,7 @@ export default function AdminProducts() {
                 <th className="text-left p-4 hidden sm:table-cell">Category</th>
                 <th className="text-left p-4">Price</th>
                 <th className="text-left p-4 hidden md:table-cell">Stock</th>
+                <th className="text-left p-4 hidden md:table-cell">Status</th>
                 <th className="text-right p-4">Actions</th>
               </tr>
             </thead>
@@ -61,7 +71,7 @@ export default function AdminProducts() {
               {data?.map((product) => {
                 const img = product.images.find((i) => i.isPrimary) ?? product.images[0];
                 return (
-                  <tr key={product.id} className="border-b border-slate-800/50 last:border-0 hover:bg-slate-800/30 transition-colors">
+                  <tr key={product.id} className={`border-b border-slate-800/50 last:border-0 hover:bg-slate-800/30 transition-colors ${!product.isActive ? 'opacity-60' : ''}`}>
                     <td className="p-4">
                       <div className="flex items-center gap-3">
                         <div className="w-10 h-10 rounded-lg bg-slate-800 flex-shrink-0 overflow-hidden">
@@ -74,7 +84,7 @@ export default function AdminProducts() {
                       </div>
                     </td>
                     <td className="p-4 hidden sm:table-cell">
-                      <span className="text-xs text-slate-400">{product.category?.name ?? '—'}</span>
+                      <span className="text-xs text-slate-400">{product.category?.name ?? '---'}</span>
                     </td>
                     <td className="p-4">
                       <span className="text-sm text-white">{formatPrice(product.price)}</span>
@@ -88,8 +98,20 @@ export default function AdminProducts() {
                         {product.stockQty} units
                       </span>
                     </td>
+                    <td className="p-4 hidden md:table-cell">
+                      <span className={`text-xs font-medium px-2 py-1 rounded-full ${product.isActive ? 'bg-green-900/50 text-green-400' : 'bg-slate-800 text-slate-500'}`}>
+                        {product.isActive ? 'Active' : 'Hidden'}
+                      </span>
+                    </td>
                     <td className="p-4">
                       <div className="flex items-center justify-end gap-2">
+                        <button
+                          onClick={() => toggleActive.mutate({ id: product.id, isActive: !product.isActive })}
+                          className={`p-1.5 rounded-lg transition-colors ${product.isActive ? 'text-green-400 hover:bg-slate-800' : 'text-slate-500 hover:text-green-400 hover:bg-slate-800'}`}
+                          title={product.isActive ? 'Hide product' : 'Show product'}
+                        >
+                          {product.isActive ? <Eye className="w-3.5 h-3.5" /> : <EyeOff className="w-3.5 h-3.5" />}
+                        </button>
                         <button
                           onClick={() => toggleFeatured.mutate({ id: product.id, isFeatured: !product.isFeatured })}
                           className={`p-1.5 rounded-lg transition-colors ${product.isFeatured ? 'text-gold-400 bg-gold-400/10 hover:bg-gold-400/20' : 'text-slate-500 hover:text-gold-400 hover:bg-slate-800'}`}

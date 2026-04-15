@@ -10,7 +10,6 @@ export default function Footer() {
     <footer className="bg-slate-900 text-cream-200 pt-16 pb-8">
       <div className="container mx-auto max-w-7xl">
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-10 pb-10 border-b border-slate-700">
-          {/* Brand */}
           <div className="sm:col-span-2 lg:col-span-1">
             <div className="flex items-center gap-2 mb-4">
               <div className="w-9 h-9 rounded-full bg-olive-gradient flex items-center justify-center">
@@ -25,10 +24,10 @@ export default function Footer() {
               Handcrafted wreaths made with love, pride, and purpose. Every piece tells a story.
             </p>
             <div className="flex items-center gap-3">
-              <a href="#" aria-label="Instagram" className="w-8 h-8 rounded-full bg-slate-800 hover:bg-olive-600 flex items-center justify-center transition-colors duration-200">
+              <a href="https://www.instagram.com/armygurlwreaths" target="_blank" rel="noopener noreferrer" aria-label="Instagram" className="w-8 h-8 rounded-full bg-slate-800 hover:bg-olive-600 flex items-center justify-center transition-colors duration-200">
                 <Instagram className="w-4 h-4" />
               </a>
-              <a href="#" aria-label="Facebook" className="w-8 h-8 rounded-full bg-slate-800 hover:bg-olive-600 flex items-center justify-center transition-colors duration-200">
+              <a href="https://www.facebook.com/armygurlwreaths" target="_blank" rel="noopener noreferrer" aria-label="Facebook" className="w-8 h-8 rounded-full bg-slate-800 hover:bg-olive-600 flex items-center justify-center transition-colors duration-200">
                 <Facebook className="w-4 h-4" />
               </a>
               <a href="mailto:hello@armygurlwreaths.com" aria-label="Email" className="w-8 h-8 rounded-full bg-slate-800 hover:bg-olive-600 flex items-center justify-center transition-colors duration-200">
@@ -37,7 +36,6 @@ export default function Footer() {
             </div>
           </div>
 
-          {/* Shop */}
           <div>
             <h4 className="font-heading font-semibold text-white text-sm mb-4 uppercase tracking-wider">Shop</h4>
             <ul className="space-y-2.5">
@@ -57,7 +55,6 @@ export default function Footer() {
             </ul>
           </div>
 
-          {/* Support */}
           <div>
             <h4 className="font-heading font-semibold text-white text-sm mb-4 uppercase tracking-wider">Support</h4>
             <ul className="space-y-2.5">
@@ -78,7 +75,6 @@ export default function Footer() {
             </ul>
           </div>
 
-          {/* Newsletter */}
           <div>
             <h4 className="font-heading font-semibold text-white text-sm mb-4 uppercase tracking-wider">Stay Connected</h4>
             <p className="text-sm text-slate-400 mb-4">
@@ -108,10 +104,9 @@ export default function Footer() {
           </div>
         </div>
 
-        {/* Bottom */}
         <div className="pt-8 flex flex-col sm:flex-row items-center justify-between gap-4">
           <p className="text-xs text-slate-500">
-            © {new Date().getFullYear()} ArmyGurlWreaths. All rights reserved.
+            &copy; {new Date().getFullYear()} ArmyGurlWreaths. All rights reserved.
           </p>
           <p className="text-xs text-slate-500 flex items-center gap-1">
             Made with <Heart className="w-3 h-3 text-crimson-500 fill-crimson-500" /> for those who serve

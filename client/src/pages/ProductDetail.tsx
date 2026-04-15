@@ -38,8 +38,9 @@ export default function ProductDetail() {
   const primaryImage = product.images[selectedImage] ?? product.images.find((i) => i.isPrimary) ?? product.images[0];
   const variant = product.variants.find((v) => v.id === selectedVariant);
   const effectivePrice = product.price + (variant?.priceAdjustment ?? 0);
-  const inStock = product.stockQty > 0;
-  const lowStock = product.stockQty > 0 && product.stockQty <= product.lowStockThreshold;
+  const availableStock = variant ? variant.stockQty : product.stockQty;
+  const inStock = availableStock > 0;
+  const lowStock = availableStock > 0 && availableStock <= product.lowStockThreshold;
 
   const handleAddToCart = () => {
     if (product.variants.length > 0 && !selectedVariant) {
@@ -197,7 +198,7 @@ export default function ProductDetail() {
               ) : lowStock ? (
                 <span className="inline-flex items-center gap-1.5 text-sm font-medium text-amber-600 bg-amber-50 px-3 py-1.5 rounded-full">
                   <span className="w-1.5 h-1.5 rounded-full bg-amber-500 animate-pulse" />
-                  Only {product.stockQty} left!
+                  Only {availableStock} left!
                 </span>
               ) : (
                 <span className="inline-flex items-center gap-1.5 text-sm font-medium text-green-600 bg-green-50 px-3 py-1.5 rounded-full">
@@ -270,9 +271,9 @@ export default function ProductDetail() {
                 </button>
                 <span className="w-12 text-center text-sm font-medium text-slate-800">{quantity}</span>
                 <button
-                  onClick={() => setQuantity((q) => Math.min(product.stockQty, q + 1))}
+                  onClick={() => setQuantity((q) => Math.min(availableStock, q + 1))}
                   className="w-10 h-11 flex items-center justify-center text-slate-600 hover:bg-cream-100 transition-colors"
-                  disabled={quantity >= product.stockQty}
+                  disabled={quantity >= availableStock}
                 >
                   <Plus className="w-4 h-4" />
                 </button>

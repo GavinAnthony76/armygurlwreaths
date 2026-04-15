@@ -3,18 +3,22 @@ import type { ReactNode, ErrorInfo } from 'react';
 import { Link } from 'react-router-dom';
 
 interface Props { children: ReactNode; }
-interface State { hasError: boolean; }
+interface State { hasError: boolean; errorKey: number; }
 
 export default class ErrorBoundary extends Component<Props, State> {
-  state: State = { hasError: false };
+  state: State = { hasError: false, errorKey: 0 };
 
-  static getDerivedStateFromError(): State {
+  static getDerivedStateFromError(): Partial<State> {
     return { hasError: true };
   }
 
   componentDidCatch(error: Error, info: ErrorInfo) {
     console.error('[ErrorBoundary]', error, info.componentStack);
   }
+
+  handleRetry = () => {
+    this.setState((prev) => ({ hasError: false, errorKey: prev.errorKey + 1 }));
+  };
 
   render() {
     if (this.state.hasError) {
@@ -28,12 +32,12 @@ export default class ErrorBoundary extends Component<Props, State> {
             <p className="text-slate-500 mb-6">We're sorry for the inconvenience. Please try refreshing the page.</p>
             <div className="flex gap-3 justify-center">
               <button
-                onClick={() => this.setState({ hasError: false })}
+                onClick={this.handleRetry}
                 className="btn-primary"
               >
                 Try Again
               </button>
-              <Link to="/" className="btn-outline">
+              <Link to="/" className="btn-outline" onClick={() => this.setState({ hasError: false })}>
                 Go Home
               </Link>
             </div>
@@ -41,6 +45,6 @@ export default class ErrorBoundary extends Component<Props, State> {
         </div>
       );
     }
-    return this.props.children;
+    return <div key={this.state.errorKey}>{this.props.children}</div>;
   }
 }

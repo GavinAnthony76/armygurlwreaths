@@ -8,6 +8,7 @@ import ProductDetail from './pages/ProductDetail';
 import Cart from './pages/Cart';
 import Checkout from './pages/Checkout';
 import OrderConfirmation from './pages/OrderConfirmation';
+import OrderDetail from './pages/OrderDetail';
 import Account from './pages/Account';
 import OrderHistory from './pages/OrderHistory';
 import About from './pages/About';
@@ -62,10 +63,10 @@ export default function App() {
               <Route path="/checkout" element={<Checkout />} />
               <Route path="/order-confirmation/:id" element={<OrderConfirmation />} />
               <Route path="/orders" element={<OrderHistory />} />
+              <Route path="/orders/:id" element={<OrderDetail />} />
             </Route>
           </Route>
 
-          {/* Admin routes */}
           <Route element={<AdminRoute />}>
             <Route element={<AdminLayout />}>
               <Route path="/admin" element={<AdminDashboard />} />

@@ -104,6 +104,7 @@ export declare const productFiltersSchema: z.ZodObject<{
     minPrice: z.ZodOptional<z.ZodNumber>;
     maxPrice: z.ZodOptional<z.ZodNumber>;
     isFeatured: z.ZodOptional<z.ZodUnion<[z.ZodBoolean, z.ZodEffects<z.ZodString, boolean, string>]>>;
+    isActive: z.ZodOptional<z.ZodUnion<[z.ZodBoolean, z.ZodEffects<z.ZodString, boolean, string>]>>;
     search: z.ZodOptional<z.ZodString>;
     page: z.ZodDefault<z.ZodNumber>;
     pageSize: z.ZodDefault<z.ZodNumber>;
@@ -113,6 +114,7 @@ export declare const productFiltersSchema: z.ZodObject<{
     pageSize: number;
     sortBy: "price_asc" | "price_desc" | "newest" | "name";
     category?: string | undefined;
+    isActive?: boolean | undefined;
     isFeatured?: boolean | undefined;
     tags?: string[] | undefined;
     season?: "spring" | "summer" | "fall" | "winter" | "year-round" | undefined;
@@ -121,6 +123,7 @@ export declare const productFiltersSchema: z.ZodObject<{
     search?: string | undefined;
 }, {
     category?: string | undefined;
+    isActive?: string | boolean | undefined;
     isFeatured?: string | boolean | undefined;
     tags?: string[] | undefined;
     season?: "spring" | "summer" | "fall" | "winter" | "year-round" | undefined;

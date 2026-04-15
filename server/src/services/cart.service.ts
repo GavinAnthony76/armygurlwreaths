@@ -1,6 +1,6 @@
 import { eq, and } from 'drizzle-orm';
 import { db } from '../config/db.js';
-import { carts, cartItems, products } from '../db/schema/index.js';
+import { carts, cartItems, products, productVariants } from '../db/schema/index.js';
 import { NotFoundError, ValidationError } from '../utils/AppError.js';
 import type { AddToCartInput } from '@armygurl/shared';
 
@@ -30,21 +30,31 @@ export const cartService = {
       where: eq(products.id, input.productId),
     });
     if (!product || !product.isActive) throw new NotFoundError('Product');
-    if (product.stockQty < input.quantity) {
-      throw new ValidationError(`Only ${product.stockQty} items available in stock`);
+
+    let availableStock = product.stockQty;
+
+    if (input.variantId) {
+      const variant = await db.query.productVariants.findFirst({
+        where: and(eq(productVariants.id, input.variantId), eq(productVariants.productId, input.productId)),
+      });
+      if (!variant) throw new NotFoundError('Product variant');
+      availableStock = variant.stockQty;
+    }
+
+    if (availableStock < input.quantity) {
+      throw new ValidationError(`Only ${availableStock} items available in stock`);
     }
 
     const cart = await this.getOrCreateCart(userId);
 
-    // Check if item already exists
     const existing = cart.items.find(
       (item) => item.productId === input.productId && item.variantId === (input.variantId ?? null)
     );
 
     if (existing) {
       const newQty = existing.quantity + input.quantity;
-      if (newQty > product.stockQty) {
-        throw new ValidationError(`Cannot add more — only ${product.stockQty} available`);
+      if (newQty > availableStock) {
+        throw new ValidationError(`Cannot add more — only ${availableStock} available`);
       }
       const [updated] = await db.update(cartItems)
         .set({ quantity: newQty })

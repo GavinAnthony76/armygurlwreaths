@@ -3,6 +3,7 @@ import type { Request, Response } from 'express';
 import { z } from 'zod';
 import { asyncHandler } from '../utils/asyncHandler.js';
 import { authLimiter } from '../middleware/rateLimiter.js';
+import { env } from '../config/env.js';
 
 const router = Router();
 
@@ -22,13 +23,30 @@ router.post('/', authLimiter, asyncHandler(async (req: Request, res: Response) =
 
   const { name, email, subject, message } = parsed.data;
 
-  // Log to console so admin can see submissions (email integration added when Resend is configured)
   console.info('[Contact Form]', { name, email, subject, message: message.slice(0, 80) });
 
-  // TODO: when RESEND_API_KEY is set, send email via Resend
-  // import { Resend } from 'resend';
-  // const resend = new Resend(env.RESEND_API_KEY);
-  // await resend.emails.send({ from: env.EMAIL_FROM, to: 'hello@armygurlwreaths.com', ... });
+  if (env.RESEND_API_KEY) {
+    try {
+      const { Resend } = await import('resend');
+      const resend = new Resend(env.RESEND_API_KEY);
+      await resend.emails.send({
+        from: `${env.EMAIL_FROM_NAME} <${env.EMAIL_FROM}>`,
+        to: 'hello@armygurlwreaths.com',
+        replyTo: email,
+        subject: `[Contact Form] ${subject}`,
+        html: `
+          <h2>New Contact Form Submission</h2>
+          <p><strong>Name:</strong> ${name}</p>
+          <p><strong>Email:</strong> ${email}</p>
+          <p><strong>Subject:</strong> ${subject}</p>
+          <hr />
+          <p>${message.replace(/\n/g, '<br />')}</p>
+        `,
+      });
+    } catch (err) {
+      console.error('[Contact Form] Email send failed:', err);
+    }
+  }
 
   res.json({ success: true, message: 'Message received. We will respond within 24 hours.' });
 }));

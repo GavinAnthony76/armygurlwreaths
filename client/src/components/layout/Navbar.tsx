@@ -12,7 +12,7 @@ const navLinks = [
   { label: 'Shop All', href: '/shop' },
   {
     label: 'Collections',
-    href: '#',
+    href: '/shop',
     children: [
       { label: 'Seasonal', href: '/shop/seasonal' },
       { label: 'Patriotic', href: '/shop/patriotic' },
@@ -62,7 +62,6 @@ export default function Navbar() {
     >
       <div className="container mx-auto max-w-7xl">
         <nav className="flex items-center justify-between h-16 lg:h-18">
-          {/* Logo */}
           <Link
             to="/"
             className="flex items-center gap-2 group"
@@ -79,7 +78,6 @@ export default function Navbar() {
             </div>
           </Link>
 
-          {/* Desktop Nav */}
           <div className="hidden lg:flex items-center gap-1">
             {navLinks.map((link) =>
               link.children ? (
@@ -88,9 +86,10 @@ export default function Navbar() {
                     className="nav-link flex items-center gap-1 px-3 py-2"
                     onMouseEnter={() => setCollectionsOpen(true)}
                     onMouseLeave={() => setCollectionsOpen(false)}
+                    onClick={() => { navigate(link.href); setCollectionsOpen(false); }}
                   >
                     {link.label}
-                    <ChevronDown className="w-3.5 h-3.5 transition-transform duration-200" style={{ transform: collectionsOpen ? 'rotate(180deg)' : '' }} />
+                    <ChevronDown className={cn('w-3.5 h-3.5 transition-transform duration-200', collectionsOpen && 'rotate-180')} />
                   </button>
                   <AnimatePresence>
                     {collectionsOpen && (
@@ -132,9 +131,7 @@ export default function Navbar() {
             )}
           </div>
 
-          {/* Actions */}
           <div className="flex items-center gap-1">
-            {/* Account */}
             {isAuthenticated ? (
               <div className="relative">
                 <button
@@ -147,7 +144,6 @@ export default function Navbar() {
                 <AnimatePresence>
                   {accountOpen && (
                     <>
-                      {/* Backdrop to close on outside click */}
                       <div className="fixed inset-0 z-40" onClick={() => setAccountOpen(false)} />
                       <motion.div
                         initial={{ opacity: 0, y: 8, scale: 0.97 }}
@@ -181,7 +177,6 @@ export default function Navbar() {
               </Link>
             )}
 
-            {/* Cart */}
             <button
               onClick={toggleCart}
               className="btn-ghost p-2 rounded-full relative"
@@ -199,7 +194,6 @@ export default function Navbar() {
               )}
             </button>
 
-            {/* Mobile menu */}
             <button
               className="btn-ghost p-2 rounded-full lg:hidden"
               onClick={() => setMobileOpen(!mobileOpen)}
@@ -211,7 +205,6 @@ export default function Navbar() {
         </nav>
       </div>
 
-      {/* Mobile menu */}
       <AnimatePresence>
         {mobileOpen && (
           <motion.div

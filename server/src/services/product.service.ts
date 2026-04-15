@@ -1,16 +1,34 @@
-import { eq, and, gte, lte, ilike, inArray, desc, asc, sql, count } from 'drizzle-orm';
+import { eq, and, gte, lte, ilike, desc, asc, sql, count, ne } from 'drizzle-orm';
 import { db } from '../config/db.js';
 import { products, productImages, productVariants, categories } from '../db/schema/index.js';
-import { NotFoundError } from '../utils/AppError.js';
+import { NotFoundError, ConflictError } from '../utils/AppError.js';
 import { toSlug } from '../utils/slug.js';
 import type { CreateProductInput, UpdateProductInput, ProductFiltersInput } from '@armygurl/shared';
 
+async function ensureUniqueSlug(baseSlug: string, excludeId?: string): Promise<string> {
+  let slug = baseSlug;
+  let suffix = 1;
+  while (true) {
+    const conditions = [eq(products.slug, slug)];
+    if (excludeId) conditions.push(ne(products.id, excludeId));
+    const existing = await db.query.products.findFirst({ where: and(...conditions), columns: { id: true } });
+    if (!existing) return slug;
+    slug = `${baseSlug}-${suffix++}`;
+  }
+}
+
 export const productService = {
   async list(filters: ProductFiltersInput) {
-    const { page, pageSize, sortBy, search, category, season, minPrice, maxPrice, isFeatured, tags } = filters;
+    const { page, pageSize, sortBy, search, category, season, minPrice, maxPrice, isFeatured, isActive, tags } = filters;
     const offset = (page - 1) * pageSize;
 
-    const conditions = [eq(products.isActive, true)];
+    const conditions = [];
+
+    if (isActive !== undefined) {
+      conditions.push(eq(products.isActive, isActive));
+    } else {
+      conditions.push(eq(products.isActive, true));
+    }
 
     if (category) {
       const cat = await db.query.categories.findFirst({ where: eq(categories.slug, category) });
@@ -77,14 +95,14 @@ export const productService = {
   },
 
   async create(input: CreateProductInput) {
-    const slug = toSlug(input.name);
+    const slug = await ensureUniqueSlug(toSlug(input.name));
     const [product] = await db.insert(products).values({ ...input, slug }).returning();
     return product;
   },
 
   async update(id: string, input: UpdateProductInput) {
     const updates: Record<string, unknown> = { ...input, updatedAt: new Date() };
-    if (input.name) updates.slug = toSlug(input.name);
+    if (input.name) updates.slug = await ensureUniqueSlug(toSlug(input.name), id);
 
     const [updated] = await db.update(products)
       .set(updates)
@@ -120,7 +138,7 @@ export const productService = {
   async adjustInventory(id: string, delta: number) {
     const [updated] = await db.update(products)
       .set({
-        stockQty: sql`${products.stockQty} + ${delta}`,
+        stockQty: sql`GREATEST(0, ${products.stockQty} + ${delta})`,
         updatedAt: new Date(),
       })
       .where(eq(products.id, id))

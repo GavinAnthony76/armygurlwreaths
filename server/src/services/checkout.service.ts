@@ -2,13 +2,12 @@ import { eq, sql } from 'drizzle-orm';
 import { db } from '../config/db.js';
 import { stripe } from '../config/stripe.js';
 import { env } from '../config/env.js';
-import { orders, orderItems, shippingAddresses, products, users } from '../db/schema/index.js';
+import { orders, orderItems, shippingAddresses, products, productVariants, users } from '../db/schema/index.js';
 import { cartService } from './cart.service.js';
 import { generateOrderNumber } from '../utils/slug.js';
 import { ValidationError } from '../utils/AppError.js';
 import type { ShippingAddressInput } from '@armygurl/shared';
 
-// Client cart item shape sent from the browser's Zustand store
 interface ClientCartItem {
   productId: string;
   variantId: string | null;
@@ -21,8 +20,14 @@ interface ClientCartItem {
   productImage: string | null;
 }
 
+const FREE_SHIPPING_THRESHOLD = 7500;
+const SHIPPING_COST = 895;
+
+function calculateShipping(subtotal: number): number {
+  return subtotal >= FREE_SHIPPING_THRESHOLD ? 0 : SHIPPING_COST;
+}
+
 export const checkoutService = {
-  // Sync client-side cart items into the server cart so fulfillOrder can read them
   async syncClientCart(userId: string, clientItems: ClientCartItem[]) {
     if (!clientItems.length) return;
     await cartService.clearCart(userId);
@@ -32,9 +37,7 @@ export const checkoutService = {
         variantId: item.variantId ?? undefined,
         quantity: item.quantity,
         customNote: item.customNote ?? undefined,
-      }).catch(() => {
-        // Skip items that fail (e.g. out of stock) — fulfillOrder will validate
-      });
+      }).catch(() => {});
     }
   },
 
@@ -50,10 +53,9 @@ export const checkoutService = {
       return sum + (basePrice + variantAdj) * item.quantity;
     }, 0);
 
-    const shippingCost = subtotal >= 7500 ? 0 : 895;
+    const shippingCost = calculateShipping(subtotal);
     const total = subtotal + shippingCost;
 
-    // Demo mode — Stripe keys not configured
     if (!stripe) {
       return {
         clientSecret: null,
@@ -99,10 +101,9 @@ export const checkoutService = {
       return sum + (basePrice + variantAdj) * item.quantity;
     }, 0);
 
-    const shippingCost = subtotal >= 7500 ? 0 : 895;
+    const shippingCost = calculateShipping(subtotal);
     const total = subtotal + shippingCost;
 
-    // PayPal API call
     const accessToken = await getPayPalAccessToken();
     const baseUrl = env.PAYPAL_MODE === 'live'
       ? 'https://api-m.paypal.com'
@@ -175,7 +176,7 @@ export const checkoutService = {
       return sum + (basePrice + variantAdj) * item.quantity;
     }, 0);
 
-    const shippingCost = subtotal >= 7500 ? 0 : 895;
+    const shippingCost = calculateShipping(subtotal);
     const total = subtotal + shippingCost;
     const orderNumber = generateOrderNumber();
 
@@ -208,8 +209,12 @@ export const checkoutService = {
       }))
     );
 
-    // Decrement inventory (floor at 0)
     for (const item of cart.items) {
+      if (item.variantId) {
+        await db.update(productVariants)
+          .set({ stockQty: sql`GREATEST(0, ${productVariants.stockQty} - ${item.quantity})` })
+          .where(eq(productVariants.id, item.variantId));
+      }
       await db.update(products)
         .set({
           stockQty: sql`GREATEST(0, ${products.stockQty} - ${item.quantity})`,
@@ -220,6 +225,21 @@ export const checkoutService = {
 
     await cartService.clearCart(userId);
     return order;
+  },
+
+  async fulfillOrderByPaymentIntent(paymentIntentId: string) {
+    const existingOrder = await db.query.orders.findFirst({
+      where: eq(orders.paymentIntentId, paymentIntentId),
+    });
+    if (existingOrder) {
+      if (existingOrder.status !== 'paid') {
+        await db.update(orders)
+          .set({ status: 'paid', updatedAt: new Date() })
+          .where(eq(orders.id, existingOrder.id));
+      }
+      return existingOrder;
+    }
+    return null;
   },
 };
 

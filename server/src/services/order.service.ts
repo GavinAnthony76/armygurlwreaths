@@ -22,6 +22,16 @@ export const orderService = {
     return order;
   },
 
+  async getByOrderNumber(orderNumber: string, userId?: string) {
+    const order = await db.query.orders.findFirst({
+      where: eq(orders.orderNumber, orderNumber),
+      with: { items: true, shippingAddress: true },
+    });
+    if (!order) throw new NotFoundError('Order');
+    if (userId && order.userId !== userId) throw new ForbiddenError();
+    return order;
+  },
+
   async getAllAdmin(page = 1, pageSize = 20, status?: string) {
     const conditions = status ? [eq(orders.status, status as typeof orders.status._.data)] : [];
     return db.query.orders.findMany({
