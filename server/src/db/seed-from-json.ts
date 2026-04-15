@@ -131,6 +131,9 @@ async function seed() {
   }
 
   // ── Announcements ────────────────────────────────────────────────────────
+  // Clear all announcements before re-seeding to prevent duplicates on re-runs
+  await db.delete(announcements);
+
   const announcementData = JSON.parse(readFileSync(resolve(ROOT, 'announcements.seed.json'), 'utf-8')) as Array<{
     title: string;
     message: string;
@@ -146,7 +149,7 @@ async function seed() {
       linkText: a.ctaLabel,
       linkUrl: a.ctaHref,
       isActive: a.isActive,
-    }).onConflictDoNothing();
+    });
     console.log(`  ✓ Announcement: ${a.title}`);
   }
 
