@@ -158,7 +158,7 @@ export default function AdminOrders() {
                         </h4>
                         <div className="space-y-2">
                           <select
-                            value={getTrackingInput(order.id).carrier || (order as any).shippingCarrier || ''}
+                            value={getTrackingInput(order.id).carrier || order.shippingCarrier || ''}
                             onChange={(e) => setTracking(order.id, 'carrier', e.target.value)}
                             className="w-full bg-slate-800 border border-slate-700 text-slate-300 text-sm rounded-lg px-3 py-2 focus:outline-none focus:border-olive-500"
                           >
@@ -171,7 +171,7 @@ export default function AdminOrders() {
                           <input
                             type="text"
                             placeholder="Tracking number"
-                            value={getTrackingInput(order.id).trackingNumber || (order as any).trackingNumber || ''}
+                            value={getTrackingInput(order.id).trackingNumber || order.trackingNumber || ''}
                             onChange={(e) => setTracking(order.id, 'trackingNumber', e.target.value)}
                             className="w-full bg-slate-800 border border-slate-700 text-slate-300 text-sm rounded-lg px-3 py-2 focus:outline-none focus:border-olive-500 placeholder-slate-600"
                           />

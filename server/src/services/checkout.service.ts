@@ -67,16 +67,24 @@ export const checkoutService = {
       };
     }
 
+    const order = await this.fulfillOrder(userId, 'pending_stripe', 'stripe', shippingAddress, undefined, 'pending');
+
     const paymentIntent = await stripe.paymentIntents.create({
       amount: total,
       currency: 'usd',
       automatic_payment_methods: { enabled: true },
-      metadata: { userId, cartId: cart.id },
+      metadata: { userId, orderId: order.id },
     });
+
+    await db.update(orders)
+      .set({ paymentIntentId: paymentIntent.id, updatedAt: new Date() })
+      .where(eq(orders.id, order.id));
 
     return {
       clientSecret: paymentIntent.client_secret,
       paymentIntentId: paymentIntent.id,
+      orderId: order.id,
+      orderNumber: order.orderNumber,
       demoMode: false,
       subtotal,
       shippingCost,
@@ -87,7 +95,7 @@ export const checkoutService = {
   async createDemoOrder(userId: string, shippingAddress: ShippingAddressInput, clientItems?: ClientCartItem[], notes?: string) {
     if (clientItems?.length) await this.syncClientCart(userId, clientItems);
     const demoIntentId = `demo_${Date.now()}`;
-    return this.fulfillOrder(userId, demoIntentId, 'stripe', shippingAddress, notes);
+    return this.fulfillOrder(userId, demoIntentId, 'stripe', shippingAddress, notes, 'paid');
   },
 
   async createPayPalOrder(userId: string, clientItems?: ClientCartItem[]) {
@@ -154,7 +162,7 @@ export const checkoutService = {
       throw new ValidationError('PayPal payment capture failed');
     }
 
-    return this.fulfillOrder(userId, paypalOrderId, 'paypal', shippingAddress, notes);
+    return this.fulfillOrder(userId, paypalOrderId, 'paypal', shippingAddress, notes, 'paid');
   },
 
   async fulfillOrder(
@@ -162,7 +170,8 @@ export const checkoutService = {
     paymentIntentId: string,
     paymentProvider: 'stripe' | 'paypal',
     shippingAddress: ShippingAddressInput,
-    notes?: string
+    notes?: string,
+    initialStatus: 'pending' | 'paid' = 'paid'
   ) {
     const cart = await cartService.getOrCreateCart(userId);
     if (!cart.items.length) throw new ValidationError('Cart is empty');
@@ -180,66 +189,68 @@ export const checkoutService = {
     const total = subtotal + shippingCost;
     const orderNumber = generateOrderNumber();
 
-    const [order] = await db.insert(orders).values({
-      orderNumber,
-      userId,
-      email: userEmail,
-      status: 'paid',
-      paymentProvider,
-      paymentIntentId,
-      subtotal,
-      shippingCost,
-      taxAmount: 0,
-      total,
-      notes,
-    }).returning();
+    return await db.transaction(async (tx) => {
+      const [order] = await tx.insert(orders).values({
+        orderNumber,
+        userId,
+        email: userEmail,
+        status: initialStatus,
+        paymentProvider,
+        paymentIntentId,
+        subtotal,
+        shippingCost,
+        taxAmount: 0,
+        total,
+        notes,
+      }).returning();
 
-    await db.insert(shippingAddresses).values({ orderId: order.id, userId, ...shippingAddress });
+      await tx.insert(shippingAddresses).values({ orderId: order.id, userId, ...shippingAddress });
 
-    await db.insert(orderItems).values(
-      cart.items.map((item) => ({
-        orderId: order.id,
-        productId: item.productId,
-        variantId: item.variantId,
-        productName: item.product.name,
-        variantName: item.variant ? `${item.variant.name}: ${item.variant.value}` : null,
-        price: item.product.price + (item.variant?.priceAdjustment ?? 0),
-        quantity: item.quantity,
-        customNote: item.customNote,
-      }))
-    );
+      await tx.insert(orderItems).values(
+        cart.items.map((item) => ({
+          orderId: order.id,
+          productId: item.productId,
+          variantId: item.variantId,
+          productName: item.product.name,
+          variantName: item.variant ? `${item.variant.name}: ${item.variant.value}` : null,
+          price: item.product.price + (item.variant?.priceAdjustment ?? 0),
+          quantity: item.quantity,
+          customNote: item.customNote,
+        }))
+      );
 
-    for (const item of cart.items) {
-      if (item.variantId) {
-        await db.update(productVariants)
-          .set({ stockQty: sql`GREATEST(0, ${productVariants.stockQty} - ${item.quantity})` })
-          .where(eq(productVariants.id, item.variantId));
+      for (const item of cart.items) {
+        if (item.variantId) {
+          await tx.update(productVariants)
+            .set({ stockQty: sql`GREATEST(0, ${productVariants.stockQty} - ${item.quantity})` })
+            .where(eq(productVariants.id, item.variantId));
+        }
+        await tx.update(products)
+          .set({
+            stockQty: sql`GREATEST(0, ${products.stockQty} - ${item.quantity})`,
+            updatedAt: new Date(),
+          })
+          .where(eq(products.id, item.productId));
       }
-      await db.update(products)
-        .set({
-          stockQty: sql`GREATEST(0, ${products.stockQty} - ${item.quantity})`,
-          updatedAt: new Date(),
-        })
-        .where(eq(products.id, item.productId));
-    }
 
-    await cartService.clearCart(userId);
-    return order;
+      await cartService.clearCart(userId);
+
+      return order;
+    });
   },
 
   async fulfillOrderByPaymentIntent(paymentIntentId: string) {
     const existingOrder = await db.query.orders.findFirst({
       where: eq(orders.paymentIntentId, paymentIntentId),
     });
-    if (existingOrder) {
-      if (existingOrder.status !== 'paid') {
-        await db.update(orders)
-          .set({ status: 'paid', updatedAt: new Date() })
-          .where(eq(orders.id, existingOrder.id));
-      }
-      return existingOrder;
+    if (!existingOrder) return null;
+
+    if (existingOrder.status === 'pending') {
+      await db.update(orders)
+        .set({ status: 'paid', updatedAt: new Date() })
+        .where(eq(orders.id, existingOrder.id));
     }
-    return null;
+    return existingOrder;
   },
 };
 

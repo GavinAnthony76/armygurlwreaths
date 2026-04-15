@@ -57,7 +57,7 @@ export default function OrderDetail() {
             </span>
           </motion.div>
 
-          {(order as any).trackingNumber && (
+          {order.trackingNumber && (
             <motion.div variants={fadeUp} className="card-base p-5 flex items-center gap-3">
               <div className="w-10 h-10 rounded-full bg-indigo-100 flex items-center justify-center">
                 <Truck className="w-5 h-5 text-indigo-600" />
@@ -65,8 +65,8 @@ export default function OrderDetail() {
               <div>
                 <p className="text-sm font-medium text-slate-900">Tracking Information</p>
                 <p className="text-sm text-slate-600">
-                  {(order as any).shippingCarrier && <span className="font-medium">{(order as any).shippingCarrier}: </span>}
-                  {(order as any).trackingNumber}
+                  {order.shippingCarrier && <span className="font-medium">{order.shippingCarrier}: </span>}
+                  {order.trackingNumber}
                 </p>
               </div>
             </motion.div>

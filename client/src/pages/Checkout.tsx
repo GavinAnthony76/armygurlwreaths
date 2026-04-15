@@ -315,7 +315,7 @@ function PaymentStep({ total }: { total: number }) {
     }
     if (paymentIntent?.status === 'succeeded') {
       clearCart();
-      navigate(`/order-confirmation/${paymentIntent.id}`);
+      navigate(`/order-confirmation/${paymentIntent.id}`, { replace: true });
     }
     setLoading(false);
   };

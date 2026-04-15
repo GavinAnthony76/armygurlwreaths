@@ -25,27 +25,33 @@ router.post('/', authLimiter, asyncHandler(async (req: Request, res: Response) =
 
   console.info('[Contact Form]', { name, email, subject, message: message.slice(0, 80) });
 
+  let emailSent = false;
   if (env.RESEND_API_KEY) {
-    try {
-      const { Resend } = await import('resend');
-      const resend = new Resend(env.RESEND_API_KEY);
-      await resend.emails.send({
-        from: `${env.EMAIL_FROM_NAME} <${env.EMAIL_FROM}>`,
-        to: 'hello@armygurlwreaths.com',
-        replyTo: email,
-        subject: `[Contact Form] ${subject}`,
-        html: `
-          <h2>New Contact Form Submission</h2>
-          <p><strong>Name:</strong> ${name}</p>
-          <p><strong>Email:</strong> ${email}</p>
-          <p><strong>Subject:</strong> ${subject}</p>
-          <hr />
-          <p>${message.replace(/\n/g, '<br />')}</p>
-        `,
-      });
-    } catch (err) {
-      console.error('[Contact Form] Email send failed:', err);
+    const { Resend } = await import('resend');
+    const resend = new Resend(env.RESEND_API_KEY);
+    const result = await resend.emails.send({
+      from: `${env.EMAIL_FROM_NAME} <${env.EMAIL_FROM}>`,
+      to: 'hello@armygurlwreaths.com',
+      replyTo: email,
+      subject: `[Contact Form] ${subject}`,
+      html: `
+        <h2>New Contact Form Submission</h2>
+        <p><strong>Name:</strong> ${name}</p>
+        <p><strong>Email:</strong> ${email}</p>
+        <p><strong>Subject:</strong> ${subject}</p>
+        <hr />
+        <p>${message.replace(/\n/g, '<br />')}</p>
+      `,
+    });
+    emailSent = !result.error;
+    if (result.error) {
+      console.error('[Contact Form] Email delivery failed:', result.error);
     }
+  }
+
+  if (!emailSent && env.RESEND_API_KEY) {
+    res.status(502).json({ success: false, message: 'Your message was received but email delivery failed. We will follow up shortly.' });
+    return;
   }
 
   res.json({ success: true, message: 'Message received. We will respond within 24 hours.' });
