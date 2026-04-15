@@ -57,10 +57,10 @@ export default function App() {
             <Route path="/returns" element={<Returns />} />
             <Route path="/faq" element={<FAQ />} />
             <Route path="/care" element={<Care />} />
+            <Route path="/account" element={<Account />} />
             <Route element={<ProtectedRoute />}>
               <Route path="/checkout" element={<Checkout />} />
               <Route path="/order-confirmation/:id" element={<OrderConfirmation />} />
-              <Route path="/account" element={<Account />} />
               <Route path="/orders" element={<OrderHistory />} />
             </Route>
           </Route>
