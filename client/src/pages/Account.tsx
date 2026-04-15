@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { useNavigate, useLocation } from 'react-router-dom';
+import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { motion, AnimatePresence } from 'framer-motion';
@@ -192,14 +192,14 @@ function AccountProfile() {
             </div>
           </div>
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-            <a href="/orders" className="card-base p-4 hover:shadow-card-hover transition-shadow cursor-pointer">
-              <h3 className="font-semibold text-slate-800">Order History</h3>
+            <Link to="/orders" className="card-base p-4 hover:shadow-card-hover transition-shadow cursor-pointer group">
+              <h3 className="font-semibold text-slate-800 group-hover:text-olive-700 transition-colors">Order History</h3>
               <p className="text-sm text-slate-500 mt-1">View and track your orders</p>
-            </a>
-            <div className="card-base p-4">
-              <h3 className="font-semibold text-slate-800">Account Details</h3>
-              <p className="text-sm text-slate-500 mt-1">Manage your profile</p>
-            </div>
+            </Link>
+            <Link to="/contact" className="card-base p-4 hover:shadow-card-hover transition-shadow cursor-pointer group">
+              <h3 className="font-semibold text-slate-800 group-hover:text-olive-700 transition-colors">Get Help</h3>
+              <p className="text-sm text-slate-500 mt-1">Contact us with any questions</p>
+            </Link>
           </div>
         </div>
       </div>

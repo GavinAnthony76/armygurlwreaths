@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
-import { ShoppingBag, Heart, Star } from 'lucide-react';
+import { ShoppingBag, Heart } from 'lucide-react';
 import { formatPrice } from '../../lib/formatters';
 import { useCartStore } from '../../stores/cartStore';
 import { cardHover, fadeUp } from '../../design-system/motion';
@@ -169,13 +169,6 @@ export default function ProductCard({ product, className }: ProductCardProps) {
               )}
             </div>
 
-            {/* Star placeholder */}
-            <div className="flex items-center gap-1 mt-1">
-              {[...Array(5)].map((_, i) => (
-                <Star key={i} className="w-3 h-3 fill-gold-400 text-gold-400" />
-              ))}
-              <span className="text-[10px] text-slate-500 ml-1">(24)</span>
-            </div>
           </div>
         </motion.div>
       </Link>

@@ -29,9 +29,26 @@ export default function Checkout() {
   const shippingCost = subtotal >= 7500 ? 0 : 895;
   const total = subtotal + shippingCost;
 
+  // Serialise cart for the server — keeps server cart in sync without a separate sync step
+  const cartPayload = items.map((i) => ({
+    productId: i.productId,
+    variantId: i.variantId ?? null,
+    quantity: i.quantity,
+    customNote: i.customNote ?? null,
+    productName: i.productName,
+    productPrice: i.productPrice,
+    variantPriceAdj: i.variantPriceAdj,
+    variantName: i.variantName ?? null,
+    productImage: i.productImage ?? null,
+  }));
+
   const handleShippingSubmit = async (data: ShippingAddressInput) => {
+    if (!items.length) {
+      toast.error('Your cart is empty.');
+      return;
+    }
     try {
-      const response = await api.post('/checkout/intent', { shippingAddress: data });
+      const response = await api.post('/checkout/intent', { shippingAddress: data, cartItems: cartPayload });
       const result = response.data.data;
       if (result.demoMode) {
         setDemoMode(true);
@@ -190,15 +207,27 @@ function ShippingForm({ onSubmit }: { onSubmit: (data: ShippingAddressInput) => 
 
 function DemoPaymentStep({ shippingData, total }: { shippingData: ShippingAddressInput; total: number }) {
   const navigate = useNavigate();
-  const clearCart = useCartStore((s) => s.clearCart);
+  const { items, clearCart } = useCartStore();
   const [loading, setLoading] = useState(false);
+
+  const cartPayload = items.map((i) => ({
+    productId: i.productId,
+    variantId: i.variantId ?? null,
+    quantity: i.quantity,
+    customNote: i.customNote ?? null,
+    productName: i.productName,
+    productPrice: i.productPrice,
+    variantPriceAdj: i.variantPriceAdj,
+    variantName: i.variantName ?? null,
+    productImage: i.productImage ?? null,
+  }));
 
   const handleDemoCheckout = async () => {
     setLoading(true);
     try {
-      const { data } = await api.post('/checkout/demo', { shippingAddress: shippingData });
+      const { data } = await api.post('/checkout/demo', { shippingAddress: shippingData, cartItems: cartPayload });
       clearCart();
-      navigate(`/order-confirmation/${data.data.id}`);
+      navigate(`/order-confirmation/${data.data.orderNumber}`);
     } catch {
       toast.error('Demo checkout failed. Please try again.');
       setLoading(false);

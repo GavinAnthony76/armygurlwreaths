@@ -30,7 +30,7 @@ export default function OrderConfirmation() {
             Your handcrafted wreath is now in queue to be made with love.
           </motion.p>
           <motion.p variants={fadeUp} className="text-sm text-slate-500 mb-8">
-            Order reference: <span className="font-medium text-slate-700 font-mono">{id?.slice(0, 16)}</span>
+            Order reference: <span className="font-medium text-slate-700 font-mono">{id}</span>
           </motion.p>
 
           <motion.div variants={fadeUp} className="bg-cream-100 rounded-xl p-5 mb-8 text-left space-y-3">

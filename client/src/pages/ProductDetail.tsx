@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import { useQuery } from '@tanstack/react-query';
 import { motion } from 'framer-motion';
-import { ShoppingBag, ChevronLeft, Star, Heart, Share2, Minus, Plus, Check, Shield, Truck } from 'lucide-react';
+import { ShoppingBag, ChevronLeft, Heart, Share2, Minus, Plus, Check, Shield, Truck } from 'lucide-react';
 import api from '../lib/api';
 import { useCartStore } from '../stores/cartStore';
 import { formatPrice } from '../lib/formatters';
@@ -124,7 +124,19 @@ export default function ProductDetail() {
                 <button className="w-9 h-9 rounded-full bg-white/90 backdrop-blur-sm shadow flex items-center justify-center hover:bg-white transition-colors">
                   <Heart className="w-4 h-4 text-slate-600" />
                 </button>
-                <button className="w-9 h-9 rounded-full bg-white/90 backdrop-blur-sm shadow flex items-center justify-center hover:bg-white transition-colors">
+                <button
+                  onClick={async () => {
+                    const url = window.location.href;
+                    if (navigator.share) {
+                      await navigator.share({ title: product.name, url }).catch(() => {});
+                    } else {
+                      await navigator.clipboard.writeText(url).catch(() => {});
+                      toast.success('Link copied to clipboard!');
+                    }
+                  }}
+                  className="w-9 h-9 rounded-full bg-white/90 backdrop-blur-sm shadow flex items-center justify-center hover:bg-white transition-colors"
+                  aria-label="Share product"
+                >
                   <Share2 className="w-4 h-4 text-slate-600" />
                 </button>
               </div>
@@ -166,16 +178,6 @@ export default function ProductDetail() {
             <motion.h1 variants={fadeUp} className="heading-display text-2xl sm:text-3xl lg:text-4xl mt-2 mb-3">
               {product.name}
             </motion.h1>
-
-            {/* Rating placeholder */}
-            <motion.div variants={fadeUp} className="flex items-center gap-2 mb-4">
-              <div className="flex">
-                {[...Array(5)].map((_, i) => (
-                  <Star key={i} className="w-4 h-4 fill-gold-400 text-gold-400" />
-                ))}
-              </div>
-              <span className="text-sm text-slate-500">4.9 (24 reviews)</span>
-            </motion.div>
 
             {/* Price */}
             <motion.div variants={fadeUp} className="flex items-baseline gap-3 mb-6">

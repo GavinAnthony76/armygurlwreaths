@@ -2,14 +2,45 @@ import { eq, sql } from 'drizzle-orm';
 import { db } from '../config/db.js';
 import { stripe } from '../config/stripe.js';
 import { env } from '../config/env.js';
-import { orders, orderItems, shippingAddresses, products } from '../db/schema/index.js';
+import { orders, orderItems, shippingAddresses, products, users } from '../db/schema/index.js';
 import { cartService } from './cart.service.js';
 import { generateOrderNumber } from '../utils/slug.js';
 import { ValidationError } from '../utils/AppError.js';
 import type { ShippingAddressInput } from '@armygurl/shared';
 
+// Client cart item shape sent from the browser's Zustand store
+interface ClientCartItem {
+  productId: string;
+  variantId: string | null;
+  quantity: number;
+  customNote: string | null;
+  productName: string;
+  productPrice: number;
+  variantPriceAdj: number;
+  variantName: string | null;
+  productImage: string | null;
+}
+
 export const checkoutService = {
-  async createStripeIntent(userId: string, shippingAddress: ShippingAddressInput) {
+  // Sync client-side cart items into the server cart so fulfillOrder can read them
+  async syncClientCart(userId: string, clientItems: ClientCartItem[]) {
+    if (!clientItems.length) return;
+    await cartService.clearCart(userId);
+    for (const item of clientItems) {
+      await cartService.addItem(userId, {
+        productId: item.productId,
+        variantId: item.variantId ?? undefined,
+        quantity: item.quantity,
+        customNote: item.customNote ?? undefined,
+      }).catch(() => {
+        // Skip items that fail (e.g. out of stock) — fulfillOrder will validate
+      });
+    }
+  },
+
+  async createStripeIntent(userId: string, shippingAddress: ShippingAddressInput, clientItems?: ClientCartItem[]) {
+    if (clientItems?.length) await this.syncClientCart(userId, clientItems);
+
     const cart = await cartService.getOrCreateCart(userId);
     if (!cart.items.length) throw new ValidationError('Cart is empty');
 
@@ -19,7 +50,7 @@ export const checkoutService = {
       return sum + (basePrice + variantAdj) * item.quantity;
     }, 0);
 
-    const shippingCost = subtotal >= 7500 ? 0 : 895; // Free shipping over $75
+    const shippingCost = subtotal >= 7500 ? 0 : 895;
     const total = subtotal + shippingCost;
 
     // Demo mode — Stripe keys not configured
@@ -38,10 +69,7 @@ export const checkoutService = {
       amount: total,
       currency: 'usd',
       automatic_payment_methods: { enabled: true },
-      metadata: {
-        userId,
-        cartId: cart.id,
-      },
+      metadata: { userId, cartId: cart.id },
     });
 
     return {
@@ -54,12 +82,14 @@ export const checkoutService = {
     };
   },
 
-  async createDemoOrder(userId: string, shippingAddress: ShippingAddressInput, notes?: string) {
+  async createDemoOrder(userId: string, shippingAddress: ShippingAddressInput, clientItems?: ClientCartItem[], notes?: string) {
+    if (clientItems?.length) await this.syncClientCart(userId, clientItems);
     const demoIntentId = `demo_${Date.now()}`;
     return this.fulfillOrder(userId, demoIntentId, 'stripe', shippingAddress, notes);
   },
 
-  async createPayPalOrder(userId: string) {
+  async createPayPalOrder(userId: string, clientItems?: ClientCartItem[]) {
+    if (clientItems?.length) await this.syncClientCart(userId, clientItems);
     const cart = await cartService.getOrCreateCart(userId);
     if (!cart.items.length) throw new ValidationError('Cart is empty');
 
@@ -136,6 +166,9 @@ export const checkoutService = {
     const cart = await cartService.getOrCreateCart(userId);
     if (!cart.items.length) throw new ValidationError('Cart is empty');
 
+    const userRecord = await db.query.users.findFirst({ where: eq(users.id, userId) });
+    const userEmail = userRecord?.email ?? '';
+
     const subtotal = cart.items.reduce((sum, item) => {
       const basePrice = item.product.price;
       const variantAdj = item.variant?.priceAdjustment ?? 0;
@@ -149,7 +182,7 @@ export const checkoutService = {
     const [order] = await db.insert(orders).values({
       orderNumber,
       userId,
-      email: '', // filled by caller if needed
+      email: userEmail,
       status: 'paid',
       paymentProvider,
       paymentIntentId,

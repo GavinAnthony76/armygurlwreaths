@@ -13,12 +13,19 @@ import OrderHistory from './pages/OrderHistory';
 import About from './pages/About';
 import Contact from './pages/Contact';
 import NotFound from './pages/NotFound';
+import Privacy from './pages/policies/Privacy';
+import Terms from './pages/policies/Terms';
+import Shipping from './pages/policies/Shipping';
+import Returns from './pages/policies/Returns';
+import FAQ from './pages/policies/FAQ';
+import Care from './pages/policies/Care';
 import AdminLayout from './components/admin/AdminLayout';
 import AdminDashboard from './pages/admin/AdminDashboard';
 import AdminProducts from './pages/admin/AdminProducts';
 import AdminOrders from './pages/admin/AdminOrders';
 import ProtectedRoute from './router/ProtectedRoute';
 import AdminRoute from './router/AdminRoute';
+import ErrorBoundary from './components/ErrorBoundary';
 import { useEffect } from 'react';
 import { useAuthStore } from './stores/authStore';
 
@@ -33,7 +40,7 @@ export default function App() {
   }, [clearAuth]);
 
   return (
-    <>
+    <ErrorBoundary>
       <AnimatePresence mode="wait">
         <Routes location={location} key={location.pathname}>
           <Route element={<RootLayout />}>
@@ -44,6 +51,12 @@ export default function App() {
             <Route path="/cart" element={<Cart />} />
             <Route path="/about" element={<About />} />
             <Route path="/contact" element={<Contact />} />
+            <Route path="/privacy" element={<Privacy />} />
+            <Route path="/terms" element={<Terms />} />
+            <Route path="/shipping" element={<Shipping />} />
+            <Route path="/returns" element={<Returns />} />
+            <Route path="/faq" element={<FAQ />} />
+            <Route path="/care" element={<Care />} />
             <Route element={<ProtectedRoute />}>
               <Route path="/checkout" element={<Checkout />} />
               <Route path="/order-confirmation/:id" element={<OrderConfirmation />} />
@@ -65,6 +78,6 @@ export default function App() {
         </Routes>
       </AnimatePresence>
       <Toaster position="bottom-right" richColors />
-    </>
+    </ErrorBoundary>
   );
 }
