@@ -90,17 +90,14 @@ export const productService = {
 
     const whereClause = conditions.length ? and(...conditions) : undefined;
 
-    const orderMap: Record<string, ReturnType<typeof desc>> = {
-      newest: desc(products.createdAt),
-      oldest: asc(products.createdAt),
-      'price-asc': asc(products.price),
-      'price-desc': desc(products.price),
-      name: asc(products.name),
-    };
+    const orderBy = sortBy === 'price_asc' ? asc(products.price)
+      : sortBy === 'price_desc' ? desc(products.price)
+      : sortBy === 'name' ? asc(products.name)
+      : desc(products.createdAt);
 
     const result = await db.query.products.findMany({
       where: whereClause,
-      orderBy: orderMap[sortBy ?? 'newest'] ?? desc(products.createdAt),
+      orderBy,
       limit: pageSize,
       offset,
       with: { category: true, images: true, variants: true },
