@@ -14,18 +14,59 @@ const SUBJECTS = [
   'Other',
 ];
 
+interface FieldErrors {
+  name?: string;
+  email?: string;
+  message?: string;
+}
+
+function validateForm(form: { name: string; email: string; message: string }): FieldErrors {
+  const errors: FieldErrors = {};
+  if (!form.name.trim()) errors.name = 'Name is required';
+  else if (form.name.length > 100) errors.name = 'Name must be under 100 characters';
+  if (!form.email.trim()) errors.email = 'Email is required';
+  else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(form.email)) errors.email = 'Please enter a valid email';
+  if (!form.message.trim()) errors.message = 'Message is required';
+  else if (form.message.length < 10) errors.message = 'Message must be at least 10 characters';
+  else if (form.message.length > 2000) errors.message = 'Message must be under 2000 characters';
+  return errors;
+}
+
 export default function Contact() {
   const [form, setForm] = useState({ name: '', email: '', subject: SUBJECTS[0], message: '' });
   const [submitting, setSubmitting] = useState(false);
+  const [errors, setErrors] = useState<FieldErrors>({});
+  const [touched, setTouched] = useState<Record<string, boolean>>({});
+
+  const handleBlur = (field: string) => {
+    setTouched((t) => ({ ...t, [field]: true }));
+    const fieldErrors = validateForm(form);
+    setErrors((prev) => ({ ...prev, [field]: fieldErrors[field as keyof FieldErrors] }));
+  };
+
+  const handleChange = (field: string, value: string) => {
+    setForm((f) => ({ ...f, [field]: value }));
+    if (touched[field]) {
+      const updated = { ...form, [field]: value };
+      const fieldErrors = validateForm(updated);
+      setErrors((prev) => ({ ...prev, [field]: fieldErrors[field as keyof FieldErrors] }));
+    }
+  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!form.name || !form.email || !form.message) return;
+    const fieldErrors = validateForm(form);
+    setErrors(fieldErrors);
+    setTouched({ name: true, email: true, message: true });
+    if (Object.keys(fieldErrors).length > 0) return;
+
     setSubmitting(true);
     try {
       await api.post('/contact', form);
       toast.success("Message sent! We'll respond within 24 hours.");
       setForm({ name: '', email: '', subject: SUBJECTS[0], message: '' });
+      setErrors({});
+      setTouched({});
     } catch {
       toast.error('Failed to send message. Please try emailing us directly.');
     } finally {
@@ -45,7 +86,6 @@ export default function Contact() {
         </motion.div>
 
         <div className="grid grid-cols-1 lg:grid-cols-5 gap-10">
-          {/* Info column */}
           <div className="lg:col-span-2 space-y-6">
             {[
               { icon: <Mail className="w-5 h-5" />, label: 'Email', value: 'hello@armygurlwreaths.com', href: 'mailto:hello@armygurlwreaths.com' },
@@ -68,29 +108,34 @@ export default function Contact() {
             ))}
           </div>
 
-          {/* Form column */}
-          <form className="lg:col-span-3 card-base p-6 space-y-4" onSubmit={handleSubmit}>
+          <form className="lg:col-span-3 card-base p-6 space-y-4" onSubmit={handleSubmit} noValidate>
             <div className="grid grid-cols-2 gap-4">
               <div>
                 <label className="block text-sm font-medium text-slate-700 mb-1.5">Name *</label>
                 <input
-                  className="form-input"
+                  className={`form-input ${errors.name && touched.name ? 'border-crimson-500 focus:border-crimson-500' : ''}`}
                   placeholder="Jane Smith"
                   value={form.name}
-                  onChange={(e) => setForm((f) => ({ ...f, name: e.target.value }))}
-                  required
+                  onChange={(e) => handleChange('name', e.target.value)}
+                  onBlur={() => handleBlur('name')}
                 />
+                {errors.name && touched.name && (
+                  <p className="text-xs text-crimson-600 mt-1">{errors.name}</p>
+                )}
               </div>
               <div>
                 <label className="block text-sm font-medium text-slate-700 mb-1.5">Email *</label>
                 <input
                   type="email"
-                  className="form-input"
+                  className={`form-input ${errors.email && touched.email ? 'border-crimson-500 focus:border-crimson-500' : ''}`}
                   placeholder="you@email.com"
                   value={form.email}
-                  onChange={(e) => setForm((f) => ({ ...f, email: e.target.value }))}
-                  required
+                  onChange={(e) => handleChange('email', e.target.value)}
+                  onBlur={() => handleBlur('email')}
                 />
+                {errors.email && touched.email && (
+                  <p className="text-xs text-crimson-600 mt-1">{errors.email}</p>
+                )}
               </div>
             </div>
             <div>
@@ -106,14 +151,17 @@ export default function Contact() {
             <div>
               <label className="block text-sm font-medium text-slate-700 mb-1.5">Message *</label>
               <textarea
-                className="form-input resize-none"
+                className={`form-input resize-none ${errors.message && touched.message ? 'border-crimson-500 focus:border-crimson-500' : ''}`}
                 rows={5}
                 placeholder="Tell us what you need..."
                 value={form.message}
-                onChange={(e) => setForm((f) => ({ ...f, message: e.target.value }))}
-                required
-                minLength={10}
+                onChange={(e) => handleChange('message', e.target.value)}
+                onBlur={() => handleBlur('message')}
               />
+              {errors.message && touched.message && (
+                <p className="text-xs text-crimson-600 mt-1">{errors.message}</p>
+              )}
+              <p className="text-xs text-slate-400 mt-1 text-right">{form.message.length}/2000</p>
             </div>
             <button
               type="submit"

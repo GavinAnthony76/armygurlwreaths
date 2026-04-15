@@ -66,6 +66,17 @@ export default function Shop() {
     placeholderData: (prev) => prev,
   });
 
+  useEffect(() => {
+    const params: Record<string, string> = {};
+    if (filters.category) params.category = filters.category;
+    if (filters.season) params.season = filters.season;
+    if (filters.sortBy !== 'newest') params.sort = filters.sortBy;
+    if (filters.page > 1) params.page = String(filters.page);
+    if (filters.maxPrice < 30000) params.maxPrice = String(filters.maxPrice);
+    if (filters.minPrice > 0) params.minPrice = String(filters.minPrice);
+    setSearchParams(params, { replace: true });
+  }, [filters, setSearchParams]);
+
   const updateFilter = (key: string, value: string | number) => {
     setFilters((f) => ({ ...f, [key]: value, page: 1 }));
   };
