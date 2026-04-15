@@ -1,20 +1,21 @@
-import { useRef } from 'react';
+import { useRef, useState } from 'react';
 import { Link } from 'react-router-dom';
-import { motion, useScroll, useTransform, useInView } from 'framer-motion';
+import { motion, useScroll, useTransform } from 'framer-motion';
 import { useQuery } from '@tanstack/react-query';
 import { ArrowRight, Star, Shield, Truck, Heart, Award } from 'lucide-react';
 import api from '../lib/api';
 import ProductCard from '../components/product/ProductCard';
-import { fadeUp, staggerContainer, fadeIn } from '../design-system/motion';
-import { formatPrice } from '../lib/formatters';
+import { fadeUp, staggerContainer } from '../design-system/motion';
 import type { Product } from '@armygurl/shared';
 import { pageTransition } from '../design-system/motion';
+import { toast } from 'sonner';
 
 export default function Home() {
   const heroRef = useRef<HTMLDivElement>(null);
   const { scrollY } = useScroll();
   const heroY = useTransform(scrollY, [0, 600], [0, 150]);
   const heroOpacity = useTransform(scrollY, [0, 400], [1, 0]);
+  const [newsletterEmail, setNewsletterEmail] = useState('');
 
   const { data: featured } = useQuery({
     queryKey: ['products', 'featured'],
@@ -405,11 +406,19 @@ export default function Home() {
             <motion.form
               variants={fadeUp}
               className="flex flex-col sm:flex-row gap-3 max-w-md mx-auto"
-              onSubmit={(e) => e.preventDefault()}
+              onSubmit={(e) => {
+                e.preventDefault();
+                if (!newsletterEmail) return;
+                setNewsletterEmail('');
+                toast.success('You\'re on the list! We\'ll be in touch soon.');
+              }}
             >
               <input
                 type="email"
+                value={newsletterEmail}
+                onChange={(e) => setNewsletterEmail(e.target.value)}
                 placeholder="Enter your email"
+                required
                 className="flex-1 bg-white/15 backdrop-blur-sm border border-white/30 rounded-lg px-4 py-3 text-white placeholder-white/60 focus:outline-none focus:border-white/60 transition-colors"
               />
               <button type="submit" className="bg-white text-olive-700 font-semibold px-6 py-3 rounded-lg hover:bg-cream-100 transition-colors whitespace-nowrap">

@@ -1,7 +1,11 @@
+import { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { Heart, Instagram, Facebook, Mail } from 'lucide-react';
+import { toast } from 'sonner';
 
 export default function Footer() {
+  const [footerEmail, setFooterEmail] = useState('');
+
   return (
     <footer className="bg-slate-900 text-cream-200 pt-16 pb-8">
       <div className="container mx-auto max-w-7xl">
@@ -80,10 +84,21 @@ export default function Footer() {
             <p className="text-sm text-slate-400 mb-4">
               Get seasonal updates, exclusive offers, and new collection announcements.
             </p>
-            <form className="space-y-2" onSubmit={(e) => e.preventDefault()}>
+            <form
+              className="space-y-2"
+              onSubmit={(e) => {
+                e.preventDefault();
+                if (!footerEmail) return;
+                setFooterEmail('');
+                toast.success('You\'re on the list! We\'ll be in touch soon.');
+              }}
+            >
               <input
                 type="email"
+                value={footerEmail}
+                onChange={(e) => setFooterEmail(e.target.value)}
                 placeholder="your@email.com"
+                required
                 className="w-full bg-slate-800 border border-slate-700 rounded-lg px-3 py-2.5 text-sm text-white placeholder-slate-500 focus:outline-none focus:border-olive-500 transition-colors"
               />
               <button type="submit" className="w-full bg-olive-500 hover:bg-olive-600 text-white text-sm font-medium py-2.5 rounded-lg transition-colors">

@@ -219,13 +219,37 @@ export default function Navbar() {
               <NavLink to="/contact" onClick={() => setMobileOpen(false)} className="block py-2.5 text-sm font-medium text-slate-700 hover:text-olive-600">
                 Contact
               </NavLink>
-              {!isAuthenticated && (
-                <div className="pt-2 border-t border-cream-200">
+              <div className="pt-2 border-t border-cream-200">
+                {isAuthenticated ? (
+                  <div className="space-y-1">
+                    <div className="px-1 py-1.5">
+                      <div className="text-xs text-slate-500">Signed in as</div>
+                      <div className="text-sm font-medium text-slate-800 truncate">{user?.email}</div>
+                    </div>
+                    {user?.role === 'admin' && (
+                      <Link to="/admin" onClick={() => setMobileOpen(false)} className="block py-2 text-sm font-medium text-olive-600 hover:text-olive-700">
+                        Admin Dashboard
+                      </Link>
+                    )}
+                    <Link to="/account" onClick={() => setMobileOpen(false)} className="block py-2 text-sm text-slate-700 hover:text-olive-600">
+                      My Account
+                    </Link>
+                    <Link to="/orders" onClick={() => setMobileOpen(false)} className="block py-2 text-sm text-slate-700 hover:text-olive-600">
+                      Order History
+                    </Link>
+                    <button
+                      onClick={() => { setMobileOpen(false); handleLogout(); }}
+                      className="block w-full text-left py-2 text-sm text-crimson-600 hover:text-crimson-700"
+                    >
+                      Sign Out
+                    </button>
+                  </div>
+                ) : (
                   <Link to="/account" onClick={() => setMobileOpen(false)} className="btn-outline w-full text-center">
                     Sign In
                   </Link>
-                </div>
-              )}
+                )}
+              </div>
             </div>
           </motion.div>
         )}
