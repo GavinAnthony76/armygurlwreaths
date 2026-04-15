@@ -10,10 +10,10 @@ const router = Router();
 
 router.get('/', validate(productFiltersSchema, 'query'), asyncHandler(productsController.list));
 router.get('/featured', asyncHandler(productsController.featured));
+router.get('/admin/all', authenticate, requireAdmin, validate(productFiltersSchema, 'query'), asyncHandler(productsController.adminList));
 router.get('/:slug', asyncHandler(productsController.getBySlug));
 router.get('/:id/related', asyncHandler(productsController.related));
 
-// Admin routes
 router.post('/', authenticate, requireAdmin, validate(createProductSchema), asyncHandler(productsController.create));
 router.patch('/:id', authenticate, requireAdmin, validate(updateProductSchema), asyncHandler(productsController.update));
 router.delete('/:id', authenticate, requireAdmin, asyncHandler(productsController.delete));

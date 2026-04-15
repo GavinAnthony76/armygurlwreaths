@@ -14,7 +14,7 @@ export default function AdminProducts() {
 
   const { data, isLoading, error } = useQuery({
     queryKey: ['admin', 'products'],
-    queryFn: () => api.get('/products?pageSize=100').then((r) => r.data.data.products as Product[]),
+    queryFn: () => api.get('/products/admin/all?pageSize=100').then((r) => r.data.data.products as Product[]),
   });
 
   const deleteMut = useMutation({

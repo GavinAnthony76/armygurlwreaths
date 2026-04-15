@@ -7,6 +7,11 @@ export const productsController = {
     res.json({ success: true, data: result });
   },
 
+  async adminList(req: Request, res: Response) {
+    const result = await productService.adminList(req.query as never);
+    res.json({ success: true, data: result });
+  },
+
   async featured(_req: Request, res: Response) {
     const products = await productService.getFeatured();
     res.json({ success: true, data: products });

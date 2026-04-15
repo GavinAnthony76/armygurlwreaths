@@ -24,11 +24,7 @@ export const productService = {
 
     const conditions = [];
 
-    if (isActive !== undefined) {
-      conditions.push(eq(products.isActive, isActive));
-    } else {
-      conditions.push(eq(products.isActive, true));
-    }
+    conditions.push(eq(products.isActive, true));
 
     if (category) {
       const cat = await db.query.categories.findFirst({ where: eq(categories.slug, category) });
@@ -58,6 +54,63 @@ export const productService = {
     ]);
 
     const total = totalResult[0]?.count ?? 0;
+    return {
+      products: result,
+      total,
+      page,
+      pageSize,
+      totalPages: Math.ceil(total / pageSize),
+    };
+  },
+
+  async adminList(filters: ProductFiltersInput) {
+    const { page, pageSize, sortBy, search, category, season, minPrice, maxPrice, isFeatured, isActive, tags } = filters;
+    const offset = (page - 1) * pageSize;
+
+    const conditions = [];
+
+    if (isActive !== undefined) {
+      conditions.push(eq(products.isActive, isActive));
+    }
+
+    if (category) {
+      const cat = await db.query.categories.findFirst({ where: eq(categories.slug, category) });
+      if (cat) conditions.push(eq(products.categoryId, cat.id));
+    }
+    if (season) conditions.push(eq(products.season, season));
+    if (isFeatured !== undefined) conditions.push(eq(products.isFeatured, isFeatured));
+    if (minPrice !== undefined) conditions.push(gte(products.price, minPrice));
+    if (maxPrice !== undefined) conditions.push(lte(products.price, maxPrice));
+    if (search) conditions.push(ilike(products.name, `%${search}%`));
+    if (tags?.length) {
+      for (const tag of tags) {
+        conditions.push(sql`${products.tags}::jsonb ? ${tag}`);
+      }
+    }
+
+    const whereClause = conditions.length ? and(...conditions) : undefined;
+
+    const orderMap: Record<string, ReturnType<typeof desc>> = {
+      newest: desc(products.createdAt),
+      oldest: asc(products.createdAt),
+      'price-asc': asc(products.price),
+      'price-desc': desc(products.price),
+      name: asc(products.name),
+    };
+
+    const result = await db.query.products.findMany({
+      where: whereClause,
+      orderBy: orderMap[sortBy ?? 'newest'] ?? desc(products.createdAt),
+      limit: pageSize,
+      offset,
+      with: { category: true, images: true, variants: true },
+    });
+
+    const [{ count: total }] = await db
+      .select({ count: sql<number>`count(*)::int` })
+      .from(products)
+      .where(whereClause);
+
     return {
       products: result,
       total,
