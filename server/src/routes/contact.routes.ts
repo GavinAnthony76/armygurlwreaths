@@ -32,7 +32,7 @@ router.post('/', authLimiter, asyncHandler(async (req: Request, res: Response) =
     const result = await resend.emails.send({
       from: `${env.EMAIL_FROM_NAME} <${env.EMAIL_FROM}>`,
       to: 'hello@armygurlwreaths.com',
-      replyTo: email,
+      reply_to: email,
       subject: `[Contact Form] ${subject}`,
       html: `
         <h2>New Contact Form Submission</h2>

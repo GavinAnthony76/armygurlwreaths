@@ -321,12 +321,14 @@ export const checkoutService = {
             .set({ stockQty: sql`GREATEST(0, ${productVariants.stockQty} - ${item.quantity})` })
             .where(eq(productVariants.id, item.variantId));
         }
-        await tx.update(products)
-          .set({
-            stockQty: sql`GREATEST(0, ${products.stockQty} - ${item.quantity})`,
-            updatedAt: new Date(),
-          })
-          .where(eq(products.id, item.productId));
+        if (item.productId) {
+          await tx.update(products)
+            .set({
+              stockQty: sql`GREATEST(0, ${products.stockQty} - ${item.quantity})`,
+              updatedAt: new Date(),
+            })
+            .where(eq(products.id, item.productId));
+        }
       }
 
       if (existingOrder.userId) {
