@@ -41,13 +41,23 @@ export const checkoutService = {
   async syncClientCart(userId: string, clientItems: ClientCartItem[]) {
     if (!clientItems.length) return;
     await cartService.clearCart(userId);
+    const failedItems: string[] = [];
     for (const item of clientItems) {
-      await cartService.addItem(userId, {
-        productId: item.productId,
-        variantId: item.variantId ?? undefined,
-        quantity: item.quantity,
-        customNote: item.customNote ?? undefined,
-      }).catch(() => {});
+      try {
+        await cartService.addItem(userId, {
+          productId: item.productId,
+          variantId: item.variantId ?? undefined,
+          quantity: item.quantity,
+          customNote: item.customNote ?? undefined,
+        });
+      } catch (err) {
+        failedItems.push(item.productName || item.productId);
+      }
+    }
+    if (failedItems.length > 0) {
+      throw new ValidationError(
+        `The following items could not be added to your cart (out of stock or unavailable): ${failedItems.join(', ')}`
+      );
     }
   },
 
