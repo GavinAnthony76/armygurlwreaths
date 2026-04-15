@@ -11,6 +11,9 @@ import webhookRoutes from './routes/webhooks.routes.js';
 export function createApp() {
   const app = express();
 
+  // Trust Replit's reverse proxy so rate limiting & IP detection work correctly
+  app.set('trust proxy', 1);
+
   // Security headers
   app.use(helmet());
 
