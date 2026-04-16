@@ -3,9 +3,9 @@ import { Truck, Package, Clock, MapPin } from 'lucide-react';
 import { pageTransition, staggerContainer, fadeUp } from '../../design-system/motion';
 
 const highlights = [
-  { icon: <Clock className="w-5 h-5" />, title: 'Production Time', text: '5–7 business days per wreath, as each is handcrafted to order.' },
+  { icon: <Clock className="w-5 h-5" />, title: 'Production Time', text: '5–7 business days for handcrafted items. Apparel ships within 3–5 business days.' },
   { icon: <Truck className="w-5 h-5" />, title: 'Free Shipping', text: 'All orders over $75 ship free within the contiguous United States.' },
-  { icon: <Package className="w-5 h-5" />, title: 'Careful Packaging', text: 'Every wreath is packaged with protective foam and a reinforced box to arrive in perfect condition.' },
+  { icon: <Package className="w-5 h-5" />, title: 'Careful Packaging', text: 'Every item is packaged with care to arrive in perfect condition.' },
   { icon: <MapPin className="w-5 h-5" />, title: 'Ships From', text: 'United States. We currently ship to all 50 states including APO/FPO military addresses.' },
 ];
 

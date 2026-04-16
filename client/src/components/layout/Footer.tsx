@@ -17,11 +17,11 @@ export default function Footer() {
               </div>
               <div>
                 <div className="font-heading font-bold text-white text-base leading-none">ArmyGurl</div>
-                <div className="font-accent text-olive-400 text-xs leading-none">Wreaths</div>
+                <div className="font-accent text-olive-400 text-xs leading-none">Decor & Apparel</div>
               </div>
             </div>
             <p className="text-sm text-slate-400 leading-relaxed mb-5">
-              Handcrafted wreaths made with love, pride, and purpose. Every piece tells a story.
+              Handcrafted wreaths, home decor, and apparel made with love, pride, and purpose. Every piece tells a story.
             </p>
             <div className="flex items-center gap-3">
               <a href="https://www.instagram.com/armygurlwreaths" target="_blank" rel="noopener noreferrer" aria-label="Instagram" className="w-8 h-8 rounded-full bg-slate-800 hover:bg-olive-600 flex items-center justify-center transition-colors duration-200">
@@ -41,9 +41,10 @@ export default function Footer() {
             <ul className="space-y-2.5">
               {[
                 { label: 'All Products', href: '/shop' },
-                { label: 'Seasonal Collection', href: '/shop/seasonal' },
-                { label: 'Patriotic Collection', href: '/shop/patriotic' },
-                { label: 'Everyday Wreaths', href: '/shop/everyday' },
+                { label: 'Wreaths', href: '/shop/wreaths' },
+                { label: 'Apparel', href: '/shop/apparel' },
+                { label: 'Home Decor', href: '/shop/home-decor' },
+                { label: 'Patriotic', href: '/shop/patriotic' },
                 { label: 'Custom Orders', href: '/shop/custom' },
               ].map((link) => (
                 <li key={link.label}>

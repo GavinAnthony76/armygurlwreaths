@@ -319,7 +319,7 @@ export default function ProductDetail() {
           viewport={{ once: true }}
           className="mt-16 max-w-3xl"
         >
-          <h2 className="font-heading font-semibold text-xl text-slate-900 mb-4">About This Wreath</h2>
+          <h2 className="font-heading font-semibold text-xl text-slate-900 mb-4">About This Product</h2>
           <p className="text-slate-600 leading-relaxed whitespace-pre-line">{product.description}</p>
 
           {product.tags.length > 0 && (

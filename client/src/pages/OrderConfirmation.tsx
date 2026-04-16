@@ -38,7 +38,7 @@ export default function OrderConfirmation() {
             Thank You!
           </motion.h1>
           <motion.p variants={fadeUp} className="text-slate-600 mb-2">
-            Your handcrafted wreath is now in queue to be made with love.
+            Your order is now in queue to be made with love.
           </motion.p>
           <motion.p variants={fadeUp} className="text-sm text-slate-500 mb-2">
             Order reference: <span className="font-medium text-slate-700 font-mono">{order?.orderNumber ?? id}</span>
@@ -51,7 +51,7 @@ export default function OrderConfirmation() {
 
           <motion.div variants={fadeUp} className="bg-cream-100 rounded-xl p-5 mb-8 text-left space-y-3">
             {[
-              { icon: <Package className="w-4 h-4 text-olive-600" />, title: 'In Production', text: 'Your wreath will be handcrafted within 5-7 business days' },
+              { icon: <Package className="w-4 h-4 text-olive-600" />, title: 'In Production', text: 'Your order will be prepared within 5-7 business days' },
               { icon: <Heart className="w-4 h-4 text-crimson-500" />, title: 'Made with Love', text: 'Each piece is crafted by hand, just for you' },
             ].map((item) => (
               <div key={item.title} className="flex items-start gap-3">

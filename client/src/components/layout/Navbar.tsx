@@ -14,9 +14,10 @@ const navLinks = [
     label: 'Collections',
     href: '/shop',
     children: [
-      { label: 'Seasonal', href: '/shop/seasonal' },
+      { label: 'Wreaths', href: '/shop/wreaths' },
+      { label: 'Apparel', href: '/shop/apparel' },
+      { label: 'Home Decor', href: '/shop/home-decor' },
       { label: 'Patriotic', href: '/shop/patriotic' },
-      { label: 'Everyday', href: '/shop/everyday' },
       { label: 'Custom Orders', href: '/shop/custom' },
     ],
   },
@@ -74,7 +75,7 @@ export default function Navbar() {
               <div className="font-heading font-bold text-slate-900 text-base leading-none">
                 ArmyGurl
               </div>
-              <div className="font-accent text-olive-500 text-xs leading-none">Wreaths</div>
+              <div className="font-accent text-olive-500 text-xs leading-none">Decor & Apparel</div>
             </div>
           </Link>
 

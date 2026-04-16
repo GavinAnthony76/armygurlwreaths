@@ -1,5 +1,14 @@
 # ArmyGurlWreaths — Replit Setup
 
+## Product Scope
+
+ArmyGurlWreaths sells handcrafted home decor, apparel, and custom items with a military/patriotic theme:
+- **Wreaths** — Seasonal and year-round handcrafted wreaths
+- **Apparel** — Shirts, hoodies for men, women, and kids (all ages)
+- **Home Decor** — Signs, door hangers, and accent pieces
+- **Patriotic** — Military pride items across all product types
+- **Custom Orders** — Fully custom designs per customer specification
+
 ## Architecture
 
 Monorepo with three workspaces:
@@ -41,6 +50,8 @@ cd server && DATABASE_URL="$DATABASE_URL" ../node_modules/.bin/tsx --tsconfig ts
 ```
 
 Tables: users, products, product_images, product_variants, categories, orders, order_items, cart, cart_items, reviews, announcements, shipping_addresses
+
+Product variants (product_variants): `name` + `value` per product (e.g., Size/M). Apparel has 7 sizes each (XS–3XL adults, 2T–YXL kids). 2XL/3XL adult sizes carry a +$3.00 price adjustment. Seeded via `seed.ts`.
 
 ## Key Routes
 

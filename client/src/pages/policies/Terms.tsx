@@ -16,7 +16,7 @@ export default function Terms() {
 
           <section>
             <h2 className="font-heading font-semibold text-xl text-slate-900 mb-3">Products & Orders</h2>
-            <p>All wreaths are handcrafted to order. Because each piece is made individually, slight variations in color and arrangement from product photos are expected and are part of the handmade nature of our products. We reserve the right to refuse or cancel orders at our discretion.</p>
+            <p>Many of our products are handcrafted to order. Because each piece is made individually, slight variations in color and arrangement from product photos are expected and are part of the handmade nature of our products. Apparel items are printed and shipped per standard sizing. We reserve the right to refuse or cancel orders at our discretion.</p>
           </section>
 
           <section>

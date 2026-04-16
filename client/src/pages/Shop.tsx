@@ -18,9 +18,10 @@ const SORT_OPTIONS = [
 
 const CATEGORIES = [
   { value: '', label: 'All Collections' },
-  { value: 'seasonal', label: 'Seasonal' },
+  { value: 'wreaths', label: 'Wreaths' },
+  { value: 'apparel', label: 'Apparel' },
+  { value: 'home-decor', label: 'Home Decor' },
   { value: 'patriotic', label: 'Patriotic' },
-  { value: 'everyday', label: 'Everyday' },
   { value: 'custom', label: 'Custom Orders' },
 ];
 

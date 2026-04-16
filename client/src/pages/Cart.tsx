@@ -19,8 +19,8 @@ export default function Cart() {
           <div className="card-base p-16 text-center">
             <ShoppingBag className="w-16 h-16 text-cream-400 mx-auto mb-4" />
             <h2 className="font-heading text-2xl text-slate-700 mb-2">Your cart is empty</h2>
-            <p className="text-slate-500 mb-6">Discover our handcrafted wreath collection</p>
-            <Link to="/shop" className="btn-primary">Browse Wreaths <ArrowRight className="w-4 h-4" /></Link>
+            <p className="text-slate-500 mb-6">Discover our handcrafted collection</p>
+            <Link to="/shop" className="btn-primary">Browse Products <ArrowRight className="w-4 h-4" /></Link>
           </div>
         ) : (
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">

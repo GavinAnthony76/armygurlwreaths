@@ -7,7 +7,7 @@ const VALUES = [
   {
     icon: <Heart className="w-6 h-6" />,
     title: 'Made with Love',
-    description: 'Every wreath is hand-assembled — no assembly lines, no shortcuts. Each one is crafted with intention and care.',
+    description: 'Every piece is handcrafted — no assembly lines, no shortcuts. From wreaths to apparel, each one is made with intention and care.',
   },
   {
     icon: <Shield className="w-6 h-6" />,
@@ -17,20 +17,20 @@ const VALUES = [
   {
     icon: <Leaf className="w-6 h-6" />,
     title: 'Quality Materials',
-    description: 'We source premium ribbons, florals, and accents that hold their beauty season after season, indoors or out.',
+    description: 'We source premium materials — from ribbons and florals to soft-touch fabrics — that hold their beauty season after season.',
   },
   {
     icon: <Sparkles className="w-6 h-6" />,
     title: 'Custom & Personal',
-    description: 'Your front door is unique. We love making custom orders — bring us your colors, themes, or ideas and we\'ll bring them to life.',
+    description: 'Your style is unique. We love making custom orders — bring us your colors, themes, or ideas and we\'ll bring them to life.',
   },
 ];
 
 const STEPS = [
   { step: '01', title: 'Select or Design', description: 'Browse our ready-made collection or reach out to start a fully custom creation tailored to you.' },
-  { step: '02', title: 'Handcrafted to Order', description: 'Your wreath is assembled by hand with premium materials. We take 5–7 business days to get it just right.' },
+  { step: '02', title: 'Handcrafted to Order', description: 'Your order is made by hand with premium materials. We take 5–7 business days to get it just right.' },
   { step: '03', title: 'Carefully Packaged', description: 'Each piece is wrapped and boxed to survive shipping and arrive at your door looking perfect.' },
-  { step: '04', title: 'Delivered with Pride', description: 'Your wreath arrives ready to hang. We include care instructions so it stays beautiful for years.' },
+  { step: '04', title: 'Delivered with Pride', description: 'Your order arrives ready to enjoy. We include care instructions so everything stays beautiful.' },
 ];
 
 export default function About() {
@@ -48,7 +48,7 @@ export default function About() {
             Born from Love of Home & Service
           </h1>
           <p className="text-slate-300 text-lg leading-relaxed max-w-2xl mx-auto">
-            ArmyGurlWreaths is more than a shop — it's a mission to bring beauty, pride, and warmth to every doorstep. Rooted in the military community, built by hand, shipped with heart.
+            ArmyGurlWreaths is more than a shop — it's a mission to bring beauty, pride, and warmth to your life. From wreaths and home decor to patriotic apparel for the whole family. Rooted in the military community, built by hand, shipped with heart.
           </p>
         </div>
       </div>
@@ -60,7 +60,7 @@ export default function About() {
             <div>
               <img
                 src="https://images.unsplash.com/photo-1551836022-deb4988cc6c0?w=700&q=80"
-                alt="Handcrafting a wreath"
+                alt="Handcrafting products"
                 className="rounded-2xl shadow-modal w-full object-cover"
                 style={{ aspectRatio: '4/5' }}
               />
@@ -73,16 +73,16 @@ export default function About() {
             >
               <motion.p variants={fadeUp} className="section-label mb-3">The Beginning</motion.p>
               <motion.h2 variants={fadeUp} className="heading-display text-3xl mb-6">
-                Every Wreath Tells a Story
+                Every Piece Tells a Story
               </motion.h2>
               <motion.p variants={fadeUp} className="text-slate-600 leading-relaxed mb-4">
-                What started as a way to decorate for homecomings became a full passion. We know the feeling of counting down the days until your soldier walks through the door — and we want that door to be worthy of the moment.
+                What started as a way to decorate for homecomings grew into a full passion — wreaths, home decor, shirts, hoodies, and so much more. We know the feeling of counting down the days until your soldier walks through the door.
               </motion.p>
               <motion.p variants={fadeUp} className="text-slate-600 leading-relaxed mb-4">
-                Every wreath is hand-assembled with premium materials, seasonal accents, and deep attention to detail. We don't use machines. We don't rush. We create.
+                Every product is handcrafted or hand-selected with premium materials and deep attention to detail. We don't cut corners. We don't rush. We create.
               </motion.p>
               <motion.p variants={fadeUp} className="text-slate-600 leading-relaxed mb-8">
-                Whether you're welcoming home a hero, celebrating the seasons, or simply wanting your home to feel warm and inviting — we make something that speaks for you before you even open the door.
+                Whether you're welcoming home a hero, celebrating the seasons, wearing your pride on your sleeve, or simply wanting your home to feel warm and inviting — we make something that speaks for you.
               </motion.p>
               <motion.div variants={fadeUp} className="flex flex-col sm:flex-row gap-3">
                 <Link to="/shop" className="btn-primary">Shop Collection</Link>
@@ -203,13 +203,13 @@ export default function About() {
           >
             <motion.p variants={fadeUp} className="section-label mb-3">Ready?</motion.p>
             <motion.h2 variants={fadeUp} className="heading-display text-3xl sm:text-4xl mb-4">
-              Find Your Perfect Wreath
+              Find Your Perfect Piece
             </motion.h2>
             <motion.p variants={fadeUp} className="text-slate-500 mb-8 max-w-lg mx-auto">
-              Browse our full collection or tell us exactly what you're envisioning. We'd love to create something special for your home.
+              Browse our full collection or tell us exactly what you're envisioning. We'd love to create something special for you.
             </motion.p>
             <motion.div variants={fadeUp} className="flex flex-col sm:flex-row gap-3 justify-center">
-              <Link to="/shop" className="btn-primary px-8 py-3">Browse All Wreaths</Link>
+              <Link to="/shop" className="btn-primary px-8 py-3">Browse All Products</Link>
               <Link to="/contact" className="btn-outline px-8 py-3">Contact Us</Link>
             </motion.div>
           </motion.div>

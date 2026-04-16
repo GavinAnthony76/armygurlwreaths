@@ -23,7 +23,7 @@ export default function Home() {
   });
 
   const trustItems = [
-    { icon: <Heart className="w-6 h-6" />, title: 'Made with Love', text: 'Every wreath is handcrafted to order' },
+    { icon: <Heart className="w-6 h-6" />, title: 'Made with Love', text: 'Every piece is handcrafted to order' },
     { icon: <Shield className="w-6 h-6" />, title: 'Military Proud', text: 'Supporting our service members always' },
     { icon: <Truck className="w-6 h-6" />, title: 'Free Shipping', text: 'On all orders over $75' },
     { icon: <Award className="w-6 h-6" />, title: 'Premium Quality', text: 'Durable, beautiful, lasting designs' },
@@ -31,8 +31,8 @@ export default function Home() {
 
   const testimonials = [
     { name: 'Sarah M.', location: 'Georgia', text: 'The patriotic wreath I ordered for my husband\'s homecoming was absolutely breathtaking. She captured everything I asked for perfectly.', rating: 5 },
-    { name: 'Jennifer R.', location: 'Texas', text: 'My fall harvest wreath gets compliments every single day. Worth every penny — the quality is incredible.', rating: 5 },
-    { name: 'Melissa T.', location: 'Virginia', text: 'Ordered a custom Military Pride wreath for my son\'s graduation. She went above and beyond. We cried. 10/10.', rating: 5 },
+    { name: 'Jennifer R.', location: 'Texas', text: 'My Army Strong hoodie is the softest thing I own. I get compliments every time I wear it. The quality is incredible.', rating: 5 },
+    { name: 'Melissa T.', location: 'Virginia', text: 'Ordered a custom wreath and matching door sign for my son\'s graduation. She went above and beyond. We cried. 10/10.', rating: 5 },
   ];
 
   return (
@@ -74,7 +74,7 @@ export default function Home() {
               variants={fadeUp}
               className="heading-hero mb-6 text-balance"
             >
-              Wreaths That Tell{' '}
+              Decor & Apparel That Tell{' '}
               <span className="italic text-gold-300">Your Story</span>
             </motion.h1>
 
@@ -82,7 +82,7 @@ export default function Home() {
               variants={fadeUp}
               className="text-lg sm:text-xl text-cream-200/90 leading-relaxed mb-8 max-w-xl"
             >
-              Seasonal decor, patriotic pride, and custom designs — each piece handcrafted with the love and dedication of a military family.
+              Wreaths, home decor, shirts, hoodies, and custom designs — each piece handcrafted with the love and dedication of a military family.
             </motion.p>
 
             <motion.div variants={fadeUp} className="flex flex-col sm:flex-row gap-3 sm:gap-4">
@@ -156,20 +156,20 @@ export default function Home() {
           >
             <motion.p variants={fadeUp} className="section-label mb-3">Shop by Collection</motion.p>
             <motion.h2 variants={fadeUp} className="heading-display text-3xl sm:text-4xl lg:text-5xl mb-4">
-              Find Your Perfect Wreath
+              Find Your Perfect Piece
             </motion.h2>
             <motion.p variants={fadeUp} className="text-slate-500 max-w-xl mx-auto">
-              Each collection is designed with a distinct mood and purpose — from vibrant seasonal celebrations to quiet patriotic pride.
+              From handcrafted wreaths to patriotic apparel — each collection is designed with a distinct mood and purpose.
             </motion.p>
           </motion.div>
 
           {/* Collection cards */}
           <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
             {[
-              { name: 'Seasonal', slug: 'seasonal', image: 'https://placehold.co/600x800/8b7f50/fdfcf7?text=Seasonal+Collection', desc: 'Spring, Summer, Fall & Winter' },
-              { name: 'Patriotic', slug: 'patriotic', image: 'https://placehold.co/600x800/c8373a/fdfcf7?text=Patriotic+Collection', desc: 'Military & American Pride' },
-              { name: 'Everyday', slug: 'everyday', image: 'https://placehold.co/600x800/b8891e/fdfcf7?text=Everyday+Collection', desc: 'Year-round classic beauty' },
-              { name: 'Custom', slug: 'custom', image: 'https://placehold.co/600x800/1e293b/fdfcf7?text=Custom+Orders', desc: 'Made just for you' },
+              { name: 'Wreaths', slug: 'wreaths', image: 'https://placehold.co/600x800/8b7f50/fdfcf7?text=Wreaths', desc: 'Handcrafted for every season' },
+              { name: 'Apparel', slug: 'apparel', image: 'https://placehold.co/600x800/4b5320/fdfcf7?text=Apparel', desc: 'Shirts, hoodies & more' },
+              { name: 'Home Decor', slug: 'home-decor', image: 'https://placehold.co/600x800/b8891e/fdfcf7?text=Home+Decor', desc: 'Signs, accents & more' },
+              { name: 'Patriotic', slug: 'patriotic', image: 'https://placehold.co/600x800/c8373a/fdfcf7?text=Patriotic', desc: 'Military & American Pride' },
             ].map((col, i) => (
               <motion.div
                 key={col.name}
@@ -218,7 +218,7 @@ export default function Home() {
             >
               <div>
                 <motion.p variants={fadeUp} className="section-label mb-2">Handpicked for You</motion.p>
-                <motion.h2 variants={fadeUp} className="heading-display text-3xl sm:text-4xl">Featured Wreaths</motion.h2>
+                <motion.h2 variants={fadeUp} className="heading-display text-3xl sm:text-4xl">Featured Products</motion.h2>
               </div>
               <motion.div variants={fadeUp}>
                 <Link to="/shop" className="btn-outline text-sm">
@@ -257,7 +257,7 @@ export default function Home() {
               <div className="relative rounded-2xl overflow-hidden shadow-modal" style={{ aspectRatio: '4/3' }}>
                 <img
                   src="https://placehold.co/800x1000/8b7f50/fdfcf7?text=Our+Story"
-                  alt="Handcrafting a wreath"
+                  alt="Handcrafting products"
                   className="w-full h-full object-cover"
                   loading="lazy"
                 />
@@ -292,7 +292,7 @@ export default function Home() {
                 ArmyGurlWreaths started as a way to bring warmth and beauty to the doorsteps of military families — a reminder that home is always worth celebrating, no matter where you're stationed.
               </motion.p>
               <motion.p variants={fadeUp} className="text-slate-300 leading-relaxed mb-8">
-                Every wreath is made by hand, with attention to every ribbon, every bloom, every detail. Because when someone is coming home, they deserve to be greeted by something extraordinary.
+                From wreaths and home decor to shirts and hoodies for the whole family, every piece is made with attention to detail and pride. Because representing what you love should feel as good as it looks.
               </motion.p>
               <motion.div variants={fadeUp}>
                 <Link to="/about" className="btn-outline border-white/30 text-white hover:bg-white hover:text-slate-900">

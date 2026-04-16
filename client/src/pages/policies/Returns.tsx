@@ -16,7 +16,7 @@ export default function Returns() {
         <div className="space-y-8 text-slate-700 leading-relaxed">
           <section className="card-base p-6 border-l-4 border-olive-500">
             <h2 className="font-heading font-semibold text-xl text-slate-900 mb-2">Our Guarantee</h2>
-            <p>Because every wreath is handcrafted to order, we take great care to ensure yours arrives beautiful and intact. If your wreath arrives damaged, defective, or significantly different from what was described, we will offer a replacement or full refund — no questions asked.</p>
+            <p>Because many of our products are handcrafted to order, we take great care to ensure yours arrives beautiful and intact. If your order arrives damaged, defective, or significantly different from what was described, we will offer a replacement or full refund — no questions asked.</p>
           </section>
 
           <section>
@@ -31,7 +31,7 @@ export default function Returns() {
           <section>
             <h2 className="font-heading font-semibold text-xl text-slate-900 mb-3">What We Cannot Accept</h2>
             <ul className="list-disc pl-5 space-y-2 text-slate-700">
-              <li>Change-of-mind returns (because each wreath is made to order, we cannot resell returned items)</li>
+              <li>Change-of-mind returns on handcrafted items (made-to-order items cannot be resold)</li>
               <li>Custom orders where all specifications were provided correctly</li>
               <li>Items returned without prior authorization</li>
               <li>Items returned more than 14 days after delivery</li>

@@ -6,19 +6,19 @@ import { pageTransition, staggerContainer, fadeUp } from '../../design-system/mo
 
 const faqs = [
   {
-    q: 'Are your wreaths handmade?',
-    a: 'Yes — every single wreath is handcrafted by us, one at a time. We do not mass-produce. Each piece is made to order after you purchase.',
+    q: 'Are your products handmade?',
+    a: 'Our wreaths, home decor, and signs are 100% handcrafted by us, one at a time. Apparel is printed and finished in-house using premium materials. Every item is made to order after you purchase.',
   },
   {
     q: 'How long does it take to receive my order?',
-    a: 'Production takes 5–7 business days, plus shipping time (typically 3–5 business days for standard shipping). Total delivery time is usually 8–12 business days.',
+    a: 'Handcrafted items (wreaths, decor) take 5–7 business days to produce. Apparel ships within 3–5 business days. Add 3–5 business days for shipping. Total delivery time is usually 8–12 business days.',
   },
   {
-    q: 'Can I request a custom wreath?',
-    a: 'Absolutely! We love custom orders. Select "Custom Orders" from our Shop page or contact us at hello@armygurlwreaths.com with your ideas, colors, and any special requests.',
+    q: 'Can I request a custom order?',
+    a: 'Absolutely! We love custom orders — wreaths, signs, apparel designs, and more. Select "Custom Orders" from our Shop page or contact us at hello@armygurlwreaths.com with your ideas.',
   },
   {
-    q: 'What if my wreath arrives damaged?',
+    q: 'What if my order arrives damaged?',
     a: 'Please contact us within 7 days of delivery with your order number and photos of the damage. We will send a replacement or issue a full refund.',
   },
   {
@@ -26,12 +26,16 @@ const faqs = [
     a: 'Yes! We proudly ship to APO/FPO military addresses. As a military family ourselves, supporting our service members is our priority.',
   },
   {
+    q: 'What sizes do your shirts and hoodies come in?',
+    a: 'Our apparel is available in sizes XS through 3XL in both men\'s and women\'s fits. Kids sizes range from toddler through youth XL. Check each product page for specific size availability.',
+  },
+  {
     q: 'When is the last day to order for Christmas?',
     a: 'For guaranteed Christmas delivery, we recommend ordering by December 10th to allow for production and shipping time. We cannot guarantee delivery after that date during the holiday rush.',
   },
   {
-    q: 'How do I care for my wreath?',
-    a: 'See our detailed Care Instructions page for wreath-specific guidance. Generally, keep wreaths away from direct sunlight and moisture to preserve their colors and shape.',
+    q: 'How do I care for my products?',
+    a: 'See our detailed Care Instructions page for product-specific guidance. Generally, keep wreaths and decor away from direct sunlight and moisture. Wash apparel cold, inside out.',
   },
   {
     q: 'Do you offer wholesale or bulk pricing?',
