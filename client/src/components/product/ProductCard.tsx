@@ -97,7 +97,7 @@ export default function ProductCard({ product, className }: ProductCardProps) {
             )}
 
             {/* Badges */}
-            <div className="absolute top-3 left-3 flex flex-col gap-1.5">
+            <div className="absolute top-2 left-2 sm:top-3 sm:left-3 flex flex-col gap-1">
               {product.isFeatured && (
                 <span className="bg-gold-500 text-white text-[10px] font-semibold px-2 py-0.5 rounded-full uppercase tracking-wide">
                   Featured
@@ -123,7 +123,7 @@ export default function ProductCard({ product, className }: ProductCardProps) {
             {/* Wishlist — always visible on touch/mobile, hover-only on desktop */}
             <button
               onClick={(e) => { e.preventDefault(); setWishlist(!wishlist); }}
-              className="absolute top-3 right-3 w-9 h-9 rounded-full bg-white/90 backdrop-blur-sm shadow flex items-center justify-center transition-all duration-200 hover:scale-110 opacity-100 sm:opacity-0 sm:group-hover:opacity-100"
+              className="absolute top-2 right-2 sm:top-3 sm:right-3 w-7 h-7 sm:w-9 sm:h-9 rounded-full bg-white/90 backdrop-blur-sm shadow flex items-center justify-center transition-all duration-200 hover:scale-110 opacity-100 sm:opacity-0 sm:group-hover:opacity-100"
               aria-label="Add to wishlist"
             >
               <Heart className={cn('w-4 h-4 transition-colors', wishlist ? 'fill-crimson-500 text-crimson-500' : 'text-slate-600')} />
@@ -133,7 +133,7 @@ export default function ProductCard({ product, className }: ProductCardProps) {
             {product.stockQty > 0 && (
               <motion.button
                 onClick={handleAddToCart}
-                className="absolute bottom-3 left-3 right-3 bg-olive-500 hover:bg-olive-600 active:bg-olive-700 text-white text-xs font-medium py-3 rounded-lg flex items-center justify-center gap-1.5 transition-all duration-200 shadow-card opacity-100 sm:opacity-0 sm:group-hover:opacity-100 sm:translate-y-2 sm:group-hover:translate-y-0"
+                className="absolute bottom-2 left-2 right-2 sm:bottom-3 sm:left-3 sm:right-3 bg-olive-500 hover:bg-olive-600 active:bg-olive-700 text-white text-[10px] sm:text-xs font-medium py-2 sm:py-3 rounded-lg flex items-center justify-center gap-1 sm:gap-1.5 transition-all duration-200 shadow-card opacity-100 sm:opacity-0 sm:group-hover:opacity-100 sm:translate-y-2 sm:group-hover:translate-y-0"
               >
                 <ShoppingBag className="w-3.5 h-3.5" />
                 Quick Add
@@ -141,18 +141,16 @@ export default function ProductCard({ product, className }: ProductCardProps) {
             )}
           </div>
 
-          {/* Content */}
-          <div className="p-4">
+          <div className="p-2.5 sm:p-4">
             {product.category && (
-              <p className="section-label text-[10px] mb-1">{product.category.name}</p>
+              <p className="section-label text-[9px] sm:text-[10px] mb-0.5 sm:mb-1">{product.category.name}</p>
             )}
-            <h3 className="font-heading font-semibold text-slate-900 text-sm leading-snug mb-1 group-hover:text-olive-700 transition-colors line-clamp-2">
+            <h3 className="font-heading font-semibold text-slate-900 text-xs sm:text-sm leading-snug mb-0.5 sm:mb-1 group-hover:text-olive-700 transition-colors line-clamp-2">
               {product.name}
             </h3>
 
-            {/* Tags */}
             {product.tags.length > 0 && (
-              <div className="flex flex-wrap gap-1 mb-2">
+              <div className="hidden sm:flex flex-wrap gap-1 mb-2">
                 {product.tags.slice(0, 2).map((tag) => (
                   <span key={tag} className="text-[10px] bg-cream-200 text-slate-600 px-2 py-0.5 rounded-full">
                     {tag}
@@ -161,14 +159,12 @@ export default function ProductCard({ product, className }: ProductCardProps) {
               </div>
             )}
 
-            {/* Price */}
-            <div className="flex items-baseline gap-2">
-              <span className="font-semibold text-slate-900">{formatPrice(product.price)}</span>
+            <div className="flex items-baseline gap-1 sm:gap-2">
+              <span className="font-semibold text-slate-900 text-sm sm:text-base">{formatPrice(product.price)}</span>
               {product.compareAtPrice && (
-                <span className="text-sm text-slate-400 line-through">{formatPrice(product.compareAtPrice)}</span>
+                <span className="text-xs sm:text-sm text-slate-400 line-through">{formatPrice(product.compareAtPrice)}</span>
               )}
             </div>
-
           </div>
         </motion.div>
       </Link>

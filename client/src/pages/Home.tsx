@@ -38,7 +38,7 @@ export default function Home() {
   return (
     <motion.div {...pageTransition}>
       {/* ===== HERO ===== */}
-      <section ref={heroRef} className="relative h-screen min-h-[600px] max-h-[900px] overflow-hidden flex items-center">
+      <section ref={heroRef} className="relative h-screen min-h-[500px] sm:min-h-[600px] max-h-[900px] overflow-hidden flex items-center">
         {/* Parallax background */}
         <motion.div
           style={{ y: heroY }}
@@ -85,12 +85,12 @@ export default function Home() {
               Seasonal decor, patriotic pride, and custom designs — each piece handcrafted with the love and dedication of a military family.
             </motion.p>
 
-            <motion.div variants={fadeUp} className="flex flex-wrap gap-4">
-              <Link to="/shop" className="btn-primary text-base px-8 py-4 bg-olive-500 hover:bg-olive-400 shadow-glow-olive">
+            <motion.div variants={fadeUp} className="flex flex-col sm:flex-row gap-3 sm:gap-4">
+              <Link to="/shop" className="btn-primary text-sm sm:text-base px-6 sm:px-8 py-3 sm:py-4 bg-olive-500 hover:bg-olive-400 shadow-glow-olive">
                 Shop Collection
                 <ArrowRight className="w-5 h-5" />
               </Link>
-              <Link to="/shop/custom" className="inline-flex items-center gap-2 border border-white/40 hover:border-white/80 text-white font-medium px-8 py-4 rounded-md transition-all duration-200 text-base backdrop-blur-sm hover:bg-white/10">
+              <Link to="/shop/custom" className="inline-flex items-center justify-center gap-2 border border-white/40 hover:border-white/80 text-white font-medium px-6 sm:px-8 py-3 sm:py-4 rounded-md transition-all duration-200 text-sm sm:text-base backdrop-blur-sm hover:bg-white/10">
                 Custom Order
               </Link>
             </motion.div>
@@ -164,7 +164,7 @@ export default function Home() {
           </motion.div>
 
           {/* Collection cards */}
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+          <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
             {[
               { name: 'Seasonal', slug: 'seasonal', image: 'https://placehold.co/600x800/8b7f50/fdfcf7?text=Seasonal+Collection', desc: 'Spring, Summer, Fall & Winter' },
               { name: 'Patriotic', slug: 'patriotic', image: 'https://placehold.co/600x800/c8373a/fdfcf7?text=Patriotic+Collection', desc: 'Military & American Pride' },
@@ -191,9 +191,9 @@ export default function Home() {
                     loading="lazy"
                   />
                   <div className="absolute inset-0 bg-gradient-to-t from-slate-900/80 via-slate-900/20 to-transparent" />
-                  <div className="absolute bottom-0 left-0 right-0 p-5">
-                    <p className="text-gold-300 text-[10px] font-semibold tracking-widest uppercase mb-1">{col.desc}</p>
-                    <h3 className="font-heading font-bold text-white text-xl">{col.name}</h3>
+                  <div className="absolute bottom-0 left-0 right-0 p-3 sm:p-5">
+                    <p className="text-gold-300 text-[9px] sm:text-[10px] font-semibold tracking-widest uppercase mb-0.5 sm:mb-1 line-clamp-1">{col.desc}</p>
+                    <h3 className="font-heading font-bold text-white text-base sm:text-xl">{col.name}</h3>
                     <p className="text-cream-200/70 text-xs mt-1 flex items-center gap-1 opacity-0 group-hover:opacity-100 translate-y-2 group-hover:translate-y-0 transition-all duration-300">
                       Shop now <ArrowRight className="w-3 h-3" />
                     </p>
@@ -232,7 +232,7 @@ export default function Home() {
               initial="hidden"
               whileInView="visible"
               viewport={{ once: true }}
-              className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6"
+              className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-6"
             >
               {featured.slice(0, 4).map((product) => (
                 <ProductCard key={product.id} product={product} />
@@ -254,7 +254,7 @@ export default function Home() {
               transition={{ duration: 0.7, ease: [0.4, 0, 0.2, 1] }}
               className="relative"
             >
-              <div className="relative rounded-2xl overflow-hidden shadow-modal" style={{ aspectRatio: '4/5' }}>
+              <div className="relative rounded-2xl overflow-hidden shadow-modal" style={{ aspectRatio: '4/3' }}>
                 <img
                   src="https://placehold.co/800x1000/8b7f50/fdfcf7?text=Our+Story"
                   alt="Handcrafting a wreath"
@@ -269,7 +269,7 @@ export default function Home() {
                 whileInView={{ opacity: 1, scale: 1 }}
                 viewport={{ once: true }}
                 transition={{ delay: 0.4, duration: 0.5 }}
-                className="absolute -bottom-6 -right-6 bg-olive-500 rounded-2xl p-5 shadow-modal max-w-48"
+                className="hidden sm:block absolute -bottom-6 -right-6 bg-olive-500 rounded-2xl p-5 shadow-modal max-w-48"
               >
                 <p className="font-accent text-2xl text-white leading-tight">"Made with military heart"</p>
               </motion.div>

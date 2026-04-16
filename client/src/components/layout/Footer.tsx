@@ -7,10 +7,10 @@ export default function Footer() {
   const [footerEmail, setFooterEmail] = useState('');
 
   return (
-    <footer className="bg-slate-900 text-cream-200 pt-16 pb-8">
+    <footer className="bg-slate-900 text-cream-200 pt-10 sm:pt-16 pb-6 sm:pb-8">
       <div className="container mx-auto max-w-7xl">
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-10 pb-10 border-b border-slate-700">
-          <div className="sm:col-span-2 lg:col-span-1">
+        <div className="grid grid-cols-2 lg:grid-cols-4 gap-6 sm:gap-10 pb-8 sm:pb-10 border-b border-slate-700">
+          <div className="col-span-2 lg:col-span-1">
             <div className="flex items-center gap-2 mb-4">
               <div className="w-9 h-9 rounded-full bg-olive-gradient flex items-center justify-center">
                 <span className="text-white text-xs font-bold font-heading">AGW</span>
@@ -75,7 +75,7 @@ export default function Footer() {
             </ul>
           </div>
 
-          <div>
+          <div className="col-span-2 lg:col-span-1">
             <h4 className="font-heading font-semibold text-white text-sm mb-4 uppercase tracking-wider">Stay Connected</h4>
             <p className="text-sm text-slate-400 mb-4">
               Get seasonal updates, exclusive offers, and new collection announcements.

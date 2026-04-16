@@ -342,7 +342,7 @@ export default function ProductDetail() {
                 View all <ChevronLeft className="w-4 h-4 rotate-180" />
               </Link>
             </div>
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+            <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-6">
               {related.slice(0, 4).map((p) => (
                 <ProductCard key={p.id} product={p} />
               ))}
