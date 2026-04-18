@@ -1,0 +1,22 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(git pull:*)",
+      "Bash(ls /c/Users/guida/source/repos/armygurlwreaths/node_modules/.bin/tsx*)",
+      "Bash(ls /c/Users/guida/source/repos/armygurlwreaths/server/node_modules/.bin/tsx*)",
+      "Bash(npm install:*)",
+      "Bash(ls /c/Users/guida/source/repos/armygurlwreaths/server/.env*)",
+      "Bash(ls /c/Users/guida/source/repos/armygurlwreaths/.env*)",
+      "Bash(vercel --version)",
+      "Bash(node:*)",
+      "Bash(node_modules/.bin/tsx:*)",
+      "Bash(git add:*)",
+      "Bash(git commit -m ':*)",
+      "Bash(git push:*)",
+      "Bash(vercel logs:*)",
+      "Bash(node_modules/.bin/tsc:*)",
+      "Bash(npm run:*)",
+      "Bash(git commit:*)"
+    ]
+  }
+}
