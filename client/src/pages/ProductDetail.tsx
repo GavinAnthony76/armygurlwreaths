@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import { useQuery } from '@tanstack/react-query';
 import { motion } from 'framer-motion';
-import { ShoppingBag, ChevronLeft, Star, Heart, Share2, Minus, Plus, Check, Shield, Truck } from 'lucide-react';
+import { ShoppingBag, ChevronLeft, Heart, Share2, Minus, Plus, Check, Shield, Truck } from 'lucide-react';
 import api from '../lib/api';
 import { useCartStore } from '../stores/cartStore';
 import { formatPrice } from '../lib/formatters';
@@ -38,8 +38,9 @@ export default function ProductDetail() {
   const primaryImage = product.images[selectedImage] ?? product.images.find((i) => i.isPrimary) ?? product.images[0];
   const variant = product.variants.find((v) => v.id === selectedVariant);
   const effectivePrice = product.price + (variant?.priceAdjustment ?? 0);
-  const inStock = product.stockQty > 0;
-  const lowStock = product.stockQty > 0 && product.stockQty <= product.lowStockThreshold;
+  const availableStock = variant ? variant.stockQty : product.stockQty;
+  const inStock = availableStock > 0;
+  const lowStock = availableStock > 0 && availableStock <= product.lowStockThreshold;
 
   const handleAddToCart = () => {
     if (product.variants.length > 0 && !selectedVariant) {
@@ -124,7 +125,19 @@ export default function ProductDetail() {
                 <button className="w-9 h-9 rounded-full bg-white/90 backdrop-blur-sm shadow flex items-center justify-center hover:bg-white transition-colors">
                   <Heart className="w-4 h-4 text-slate-600" />
                 </button>
-                <button className="w-9 h-9 rounded-full bg-white/90 backdrop-blur-sm shadow flex items-center justify-center hover:bg-white transition-colors">
+                <button
+                  onClick={async () => {
+                    const url = window.location.href;
+                    if (navigator.share) {
+                      await navigator.share({ title: product.name, url }).catch(() => {});
+                    } else {
+                      await navigator.clipboard.writeText(url).catch(() => {});
+                      toast.success('Link copied to clipboard!');
+                    }
+                  }}
+                  className="w-9 h-9 rounded-full bg-white/90 backdrop-blur-sm shadow flex items-center justify-center hover:bg-white transition-colors"
+                  aria-label="Share product"
+                >
                   <Share2 className="w-4 h-4 text-slate-600" />
                 </button>
               </div>
@@ -167,16 +180,6 @@ export default function ProductDetail() {
               {product.name}
             </motion.h1>
 
-            {/* Rating placeholder */}
-            <motion.div variants={fadeUp} className="flex items-center gap-2 mb-4">
-              <div className="flex">
-                {[...Array(5)].map((_, i) => (
-                  <Star key={i} className="w-4 h-4 fill-gold-400 text-gold-400" />
-                ))}
-              </div>
-              <span className="text-sm text-slate-500">4.9 (24 reviews)</span>
-            </motion.div>
-
             {/* Price */}
             <motion.div variants={fadeUp} className="flex items-baseline gap-3 mb-6">
               <span className="text-3xl font-bold text-slate-900">{formatPrice(effectivePrice)}</span>
@@ -195,7 +198,7 @@ export default function ProductDetail() {
               ) : lowStock ? (
                 <span className="inline-flex items-center gap-1.5 text-sm font-medium text-amber-600 bg-amber-50 px-3 py-1.5 rounded-full">
                   <span className="w-1.5 h-1.5 rounded-full bg-amber-500 animate-pulse" />
-                  Only {product.stockQty} left!
+                  Only {availableStock} left!
                 </span>
               ) : (
                 <span className="inline-flex items-center gap-1.5 text-sm font-medium text-green-600 bg-green-50 px-3 py-1.5 rounded-full">
@@ -268,9 +271,9 @@ export default function ProductDetail() {
                 </button>
                 <span className="w-12 text-center text-sm font-medium text-slate-800">{quantity}</span>
                 <button
-                  onClick={() => setQuantity((q) => Math.min(product.stockQty, q + 1))}
+                  onClick={() => setQuantity((q) => Math.min(availableStock, q + 1))}
                   className="w-10 h-11 flex items-center justify-center text-slate-600 hover:bg-cream-100 transition-colors"
-                  disabled={quantity >= product.stockQty}
+                  disabled={quantity >= availableStock}
                 >
                   <Plus className="w-4 h-4" />
                 </button>
@@ -316,7 +319,7 @@ export default function ProductDetail() {
           viewport={{ once: true }}
           className="mt-16 max-w-3xl"
         >
-          <h2 className="font-heading font-semibold text-xl text-slate-900 mb-4">About This Wreath</h2>
+          <h2 className="font-heading font-semibold text-xl text-slate-900 mb-4">About This Product</h2>
           <p className="text-slate-600 leading-relaxed whitespace-pre-line">{product.description}</p>
 
           {product.tags.length > 0 && (
@@ -339,7 +342,7 @@ export default function ProductDetail() {
                 View all <ChevronLeft className="w-4 h-4 rotate-180" />
               </Link>
             </div>
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+            <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-6">
               {related.slice(0, 4).map((p) => (
                 <ProductCard key={p.id} product={p} />
               ))}

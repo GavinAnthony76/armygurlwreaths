@@ -8,14 +8,12 @@ export const api = axios.create({
   headers: { 'Content-Type': 'application/json' },
 });
 
-// Request interceptor — attach access token
 api.interceptors.request.use((config) => {
   const token = localStorage.getItem('agw_token');
   if (token) config.headers.Authorization = `Bearer ${token}`;
   return config;
 });
 
-// Response interceptor — auto-refresh on 401
 let isRefreshing = false;
 let queue: Array<{ resolve: (token: string) => void; reject: (err: unknown) => void }> = [];
 
@@ -23,6 +21,13 @@ api.interceptors.response.use(
   (response) => response,
   async (error) => {
     const original = error.config;
+
+    const isRefreshRequest = original?.url?.includes('/auth/refresh');
+    if (isRefreshRequest) {
+      localStorage.removeItem('agw_token');
+      window.dispatchEvent(new Event('auth:logout'));
+      return Promise.reject(error);
+    }
 
     if (error.response?.status === 401 && !original._retry) {
       original._retry = true;

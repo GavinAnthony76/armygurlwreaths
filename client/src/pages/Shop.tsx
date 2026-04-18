@@ -18,9 +18,10 @@ const SORT_OPTIONS = [
 
 const CATEGORIES = [
   { value: '', label: 'All Collections' },
-  { value: 'seasonal', label: 'Seasonal' },
+  { value: 'wreaths', label: 'Wreaths' },
+  { value: 'apparel', label: 'Apparel' },
+  { value: 'home-decor', label: 'Home Decor' },
   { value: 'patriotic', label: 'Patriotic' },
-  { value: 'everyday', label: 'Everyday' },
   { value: 'custom', label: 'Custom Orders' },
 ];
 
@@ -66,6 +67,17 @@ export default function Shop() {
     placeholderData: (prev) => prev,
   });
 
+  useEffect(() => {
+    const params: Record<string, string> = {};
+    if (filters.category) params.category = filters.category;
+    if (filters.season) params.season = filters.season;
+    if (filters.sortBy !== 'newest') params.sort = filters.sortBy;
+    if (filters.page > 1) params.page = String(filters.page);
+    if (filters.maxPrice < 30000) params.maxPrice = String(filters.maxPrice);
+    if (filters.minPrice > 0) params.minPrice = String(filters.minPrice);
+    setSearchParams(params, { replace: true });
+  }, [filters, setSearchParams]);
+
   const updateFilter = (key: string, value: string | number) => {
     setFilters((f) => ({ ...f, [key]: value, page: 1 }));
   };
@@ -88,7 +100,7 @@ export default function Shop() {
         </div>
       </div>
 
-      {/* Mobile filter drawer */}
+      {/* Mobile filters drawer */}
       <AnimatePresence>
         {mobileFiltersOpen && (
           <>
@@ -104,19 +116,19 @@ export default function Shop() {
               animate={{ x: 0 }}
               exit={{ x: '-100%' }}
               transition={{ type: 'tween', duration: 0.25 }}
-              className="fixed inset-y-0 left-0 z-50 w-80 max-w-[85vw] bg-white shadow-modal overflow-y-auto lg:hidden"
+              className="fixed inset-y-0 left-0 z-50 w-80 max-w-[85vw] bg-white shadow-modal flex flex-col lg:hidden"
             >
-              <div className="flex items-center justify-between p-4 border-b border-cream-200">
+              <div className="flex items-center justify-between px-6 py-4 border-b border-cream-200">
                 <h2 className="font-heading font-semibold text-slate-900">Filters</h2>
                 <button
                   onClick={() => setMobileFiltersOpen(false)}
-                  className="w-8 h-8 rounded-full bg-cream-100 flex items-center justify-center"
+                  className="btn-ghost p-1.5 rounded-full"
                   aria-label="Close filters"
                 >
-                  <X className="w-4 h-4 text-slate-600" />
+                  <X className="w-5 h-5" />
                 </button>
               </div>
-              <div className="p-4 space-y-6">
+              <div className="flex-1 overflow-y-auto px-6 py-4 space-y-6">
                 <FilterSection title="Collections">
                   <div className="space-y-2">
                     {CATEGORIES.map((cat) => (
@@ -126,7 +138,7 @@ export default function Shop() {
                           name="mobile-category"
                           value={cat.value}
                           checked={filters.category === cat.value}
-                          onChange={() => { updateFilter('category', cat.value); }}
+                          onChange={() => updateFilter('category', cat.value)}
                           className="accent-olive-500"
                         />
                         <span className={`text-sm transition-colors ${filters.category === cat.value ? 'text-olive-600 font-medium' : 'text-slate-600 group-hover:text-olive-500'}`}>
@@ -136,7 +148,6 @@ export default function Shop() {
                     ))}
                   </div>
                 </FilterSection>
-
                 <FilterSection title="Season">
                   <div className="space-y-2">
                     {SEASONS.map((s) => (
@@ -146,7 +157,7 @@ export default function Shop() {
                           name="mobile-season"
                           value={s.value}
                           checked={filters.season === s.value}
-                          onChange={() => { updateFilter('season', s.value); }}
+                          onChange={() => updateFilter('season', s.value)}
                           className="accent-olive-500"
                         />
                         <span className={`text-sm transition-colors ${filters.season === s.value ? 'text-olive-600 font-medium' : 'text-slate-600 group-hover:text-olive-500'}`}>
@@ -156,7 +167,6 @@ export default function Shop() {
                     ))}
                   </div>
                 </FilterSection>
-
                 <FilterSection title="Price Range">
                   <div className="space-y-3">
                     <div className="flex items-center justify-between text-sm text-slate-600">
@@ -174,7 +184,8 @@ export default function Shop() {
                     />
                   </div>
                 </FilterSection>
-
+              </div>
+              <div className="border-t border-cream-200 px-6 py-4 space-y-3">
                 {(filters.category || filters.season) && (
                   <button
                     onClick={() => { setFilters((f) => ({ ...f, category: '', season: '', page: 1 })); setMobileFiltersOpen(false); }}
@@ -183,12 +194,11 @@ export default function Shop() {
                     <X className="w-3.5 h-3.5" /> Clear filters
                   </button>
                 )}
-
                 <button
                   onClick={() => setMobileFiltersOpen(false)}
                   className="btn-primary w-full"
                 >
-                  Apply Filters
+                  Show {data?.total ?? ''} Results
                 </button>
               </div>
             </motion.aside>
@@ -298,7 +308,7 @@ export default function Shop() {
             {/* Grid */}
             <AnimatePresence mode="wait">
               {isLoading ? (
-                <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-6">
+                <div className="grid grid-cols-2 xl:grid-cols-3 gap-3 sm:gap-6">
                   {[...Array(6)].map((_, i) => (
                     <div key={i} className="card-base overflow-hidden">
                       <div className="skeleton" style={{ aspectRatio: '4/5' }} />
@@ -324,7 +334,7 @@ export default function Shop() {
                   variants={staggerContainer}
                   initial="hidden"
                   animate="visible"
-                  className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-6"
+                  className="grid grid-cols-2 xl:grid-cols-3 gap-3 sm:gap-6"
                 >
                   {data?.products.map((product) => (
                     <ProductCard key={product.id} product={product} />

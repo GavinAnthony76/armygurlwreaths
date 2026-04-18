@@ -1,9 +1,13 @@
-import { neon } from '@neondatabase/serverless';
-import { drizzle } from 'drizzle-orm/neon-http';
+import { Pool } from 'pg';
+import { drizzle } from 'drizzle-orm/node-postgres';
 import { env } from './env.js';
 import * as schema from '../db/schema/index.js';
 
-const sql = neon(env.DATABASE_URL);
-export const db = drizzle(sql, { schema });
+const pool = new Pool({
+  connectionString: env.DATABASE_URL,
+  ssl: env.DATABASE_URL.includes('sslmode=require') ? { rejectUnauthorized: false } : false,
+});
+
+export const db = drizzle(pool, { schema });
 
 export type Database = typeof db;

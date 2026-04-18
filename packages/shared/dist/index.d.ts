@@ -1,7 +1,7 @@
-export * from './types/user';
-export * from './types/product';
-export type { CartItem, Cart } from './types/cart';
-export * from './types/order';
-export * from './schemas/auth.schema';
-export * from './schemas/product.schema';
-export * from './schemas/checkout.schema';
+export * from './types/user.js';
+export * from './types/product.js';
+export type { CartItem, Cart } from './types/cart.js';
+export * from './types/order.js';
+export * from './schemas/auth.schema.js';
+export * from './schemas/product.schema.js';
+export * from './schemas/checkout.schema.js';

@@ -1,8 +1,9 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { X, Upload, ImagePlus } from 'lucide-react';
+import { X } from 'lucide-react';
 import { motion } from 'framer-motion';
+import { useQuery } from '@tanstack/react-query';
 import api from '../../lib/api';
 import { createProductSchema } from '@armygurl/shared';
 import type { CreateProductInput, Product } from '@armygurl/shared';
@@ -14,42 +15,67 @@ interface Props {
   onSuccess: () => void;
 }
 
+interface Category { id: string; name: string; }
+
 export default function ProductFormModal({ product, onClose, onSuccess }: Props) {
-  const [imageUrl, setImageUrl] = useState(product?.images[0]?.url ?? '');
+  const primaryImg = product?.images.find((i) => i.isPrimary) ?? product?.images[0];
+  const secondaryImg = product?.images.find((i) => !i.isPrimary && i !== primaryImg);
+
+  const [primaryImageUrl, setPrimaryImageUrl] = useState(primaryImg?.url ?? '');
+  const [secondaryImageUrl, setSecondaryImageUrl] = useState(secondaryImg?.url ?? '');
+  const [tagsInput, setTagsInput] = useState(product?.tags?.join(', ') ?? '');
   const isEdit = !!product;
 
-  const { register, handleSubmit, formState: { errors, isSubmitting } } = useForm<CreateProductInput>({
-    resolver: zodResolver(createProductSchema),
-    defaultValues: product ? {
-      name: product.name,
-      description: product.description,
-      price: product.price,
-      compareAtPrice: product.compareAtPrice ?? undefined,
-      stockQty: product.stockQty,
-      isFeatured: product.isFeatured,
-      isActive: product.isActive,
-      isCustomizable: product.isCustomizable,
-      tags: product.tags,
-      season: product.season ?? undefined,
-    } : {
-      isActive: true,
-      isFeatured: false,
-      isCustomizable: false,
-      stockQty: 0,
-      lowStockThreshold: 3,
-      tags: [],
-    },
+  const { data: categories = [] } = useQuery<Category[]>({
+    queryKey: ['categories'],
+    queryFn: () => api.get('/categories').then((r) => r.data.data),
   });
 
+  const { register, handleSubmit, reset, formState: { errors, isSubmitting } } = useForm<CreateProductInput>({
+    resolver: zodResolver(createProductSchema),
+    defaultValues: getDefaults(product),
+  });
+
+  useEffect(() => {
+    reset(getDefaults(product));
+    setPrimaryImageUrl(primaryImg?.url ?? '');
+    setSecondaryImageUrl(secondaryImg?.url ?? '');
+    setTagsInput(product?.tags?.join(', ') ?? '');
+  }, [product?.id]);
+
   const onSubmit = async (data: CreateProductInput) => {
+    if (data.categoryId === '') {
+      data.categoryId = undefined;
+    }
+
+    data.tags = tagsInput ? tagsInput.split(',').map((t) => t.trim()).filter(Boolean) : [];
+
     try {
+      let productId = product?.id;
+
       if (isEdit) {
-        await api.patch(`/products/${product.id}`, data);
+        await api.patch(`/products/${productId}`, data);
+
+        if (primaryImageUrl || secondaryImageUrl) {
+          for (const img of product.images) {
+            await api.delete(`/products/${productId}/images/${img.id}`).catch(() => {});
+          }
+          if (primaryImageUrl) {
+            await api.post(`/products/${productId}/images`, { url: primaryImageUrl, isPrimary: true });
+          }
+          if (secondaryImageUrl) {
+            await api.post(`/products/${productId}/images`, { url: secondaryImageUrl, isPrimary: false });
+          }
+        }
         toast.success('Product updated');
       } else {
         const { data: res } = await api.post('/products', data);
-        if (imageUrl) {
-          await api.post(`/products/${res.data.id}/images`, { url: imageUrl, isPrimary: true });
+        productId = res.data.id;
+        if (primaryImageUrl) {
+          await api.post(`/products/${productId}/images`, { url: primaryImageUrl, isPrimary: true });
+        }
+        if (secondaryImageUrl) {
+          await api.post(`/products/${productId}/images`, { url: secondaryImageUrl, isPrimary: false });
         }
         toast.success('Product created');
       }
@@ -89,44 +115,113 @@ export default function ProductFormModal({ product, onClose, onSuccess }: Props)
             {errors.description && <p className="text-xs text-red-400 mt-1">{errors.description.message}</p>}
           </div>
 
+          <div>
+            <label className="block text-sm font-medium text-slate-300 mb-1.5">SKU</label>
+            <input {...register('sku')} className="admin-input" placeholder="AGW-001" />
+          </div>
+
+          <div>
+            <label className="block text-sm font-medium text-slate-300 mb-1.5">Category</label>
+            <select {...register('categoryId')} className="admin-input">
+              <option value="">--- No category ---</option>
+              {categories.map((cat) => (
+                <option key={cat.id} value={cat.id}>{cat.name}</option>
+              ))}
+            </select>
+          </div>
+
           <div className="grid grid-cols-2 gap-4">
             <div>
-              <label className="block text-sm font-medium text-slate-300 mb-1.5">Price (cents) *</label>
-              <input {...register('price', { valueAsNumber: true })} type="number" className="admin-input" placeholder="8500 = $85.00" />
+              <label className="block text-sm font-medium text-slate-300 mb-1.5">Price (USD) *</label>
+              <div className="relative">
+                <span className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 text-sm">$</span>
+                <input
+                  {...register('price', { setValueAs: (v) => Math.round(parseFloat(v || '0') * 100) })}
+                  type="number"
+                  step="0.01"
+                  min="0"
+                  className="admin-input pl-7"
+                  placeholder="85.00"
+                  defaultValue={product ? (product.price / 100).toFixed(2) : ''}
+                />
+              </div>
               {errors.price && <p className="text-xs text-red-400 mt-1">{errors.price.message}</p>}
             </div>
             <div>
-              <label className="block text-sm font-medium text-slate-300 mb-1.5">Compare At (cents)</label>
-              <input {...register('compareAtPrice', { valueAsNumber: true })} type="number" className="admin-input" placeholder="11000 = $110.00" />
+              <label className="block text-sm font-medium text-slate-300 mb-1.5">Compare At (USD)</label>
+              <div className="relative">
+                <span className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 text-sm">$</span>
+                <input
+                  {...register('compareAtPrice', { setValueAs: (v) => v ? Math.round(parseFloat(v) * 100) : undefined })}
+                  type="number"
+                  step="0.01"
+                  min="0"
+                  className="admin-input pl-7"
+                  placeholder="110.00"
+                  defaultValue={product?.compareAtPrice ? (product.compareAtPrice / 100).toFixed(2) : ''}
+                />
+              </div>
             </div>
           </div>
 
           <div className="grid grid-cols-2 gap-4">
             <div>
               <label className="block text-sm font-medium text-slate-300 mb-1.5">Stock Qty</label>
-              <input {...register('stockQty', { valueAsNumber: true })} type="number" className="admin-input" />
+              <input {...register('stockQty', { valueAsNumber: true })} type="number" min="0" className="admin-input" />
             </div>
             <div>
-              <label className="block text-sm font-medium text-slate-300 mb-1.5">Season</label>
-              <select {...register('season')} className="admin-input">
-                <option value="">— None —</option>
-                <option value="spring">Spring</option>
-                <option value="summer">Summer</option>
-                <option value="fall">Fall</option>
-                <option value="winter">Winter</option>
-                <option value="year-round">Year-Round</option>
-              </select>
+              <label className="block text-sm font-medium text-slate-300 mb-1.5">Low Stock Alert At</label>
+              <input {...register('lowStockThreshold', { valueAsNumber: true })} type="number" min="0" className="admin-input" placeholder="3" />
             </div>
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-slate-300 mb-1.5">Image URL</label>
+            <label className="block text-sm font-medium text-slate-300 mb-1.5">Season</label>
+            <select {...register('season')} className="admin-input">
+              <option value="">--- None ---</option>
+              <option value="spring">Spring</option>
+              <option value="summer">Summer</option>
+              <option value="fall">Fall</option>
+              <option value="winter">Winter</option>
+              <option value="year-round">Year-Round</option>
+            </select>
+          </div>
+
+          <div>
+            <label className="block text-sm font-medium text-slate-300 mb-1.5">Tags <span className="text-slate-500 font-normal">(comma separated)</span></label>
             <input
-              value={imageUrl}
-              onChange={(e) => setImageUrl(e.target.value)}
+              value={tagsInput}
+              onChange={(e) => setTagsInput(e.target.value)}
               className="admin-input"
-              placeholder="https://example.com/image.jpg"
+              placeholder="military, patriotic, holiday"
             />
+          </div>
+
+          <div className="space-y-3">
+            <div>
+              <label className="block text-sm font-medium text-slate-300 mb-1.5">Primary Image URL</label>
+              <input
+                value={primaryImageUrl}
+                onChange={(e) => setPrimaryImageUrl(e.target.value)}
+                className="admin-input"
+                placeholder="https://example.com/primary.jpg"
+              />
+              {primaryImageUrl && (
+                <img src={primaryImageUrl} alt="Primary preview" className="mt-2 h-16 w-16 object-cover rounded-lg border border-slate-700" />
+              )}
+            </div>
+            <div>
+              <label className="block text-sm font-medium text-slate-300 mb-1.5">Hover Image URL <span className="text-slate-500 font-normal">(shows on card hover)</span></label>
+              <input
+                value={secondaryImageUrl}
+                onChange={(e) => setSecondaryImageUrl(e.target.value)}
+                className="admin-input"
+                placeholder="https://example.com/hover.jpg"
+              />
+              {secondaryImageUrl && (
+                <img src={secondaryImageUrl} alt="Hover preview" className="mt-2 h-16 w-16 object-cover rounded-lg border border-slate-700" />
+              )}
+            </div>
           </div>
 
           <div className="flex flex-wrap gap-4">
@@ -158,4 +253,32 @@ export default function ProductFormModal({ product, onClose, onSuccess }: Props)
       </motion.div>
     </div>
   );
+}
+
+function getDefaults(product: Product | null): Partial<CreateProductInput> {
+  if (!product) {
+    return {
+      isActive: true,
+      isFeatured: false,
+      isCustomizable: false,
+      stockQty: 0,
+      lowStockThreshold: 3,
+      tags: [],
+    };
+  }
+  return {
+    name: product.name,
+    description: product.description,
+    price: product.price,
+    compareAtPrice: product.compareAtPrice ?? undefined,
+    sku: product.sku ?? undefined,
+    stockQty: product.stockQty,
+    lowStockThreshold: product.lowStockThreshold,
+    categoryId: product.category?.id ?? undefined,
+    isFeatured: product.isFeatured,
+    isActive: product.isActive,
+    isCustomizable: product.isCustomizable,
+    tags: product.tags,
+    season: product.season ?? undefined,
+  };
 }

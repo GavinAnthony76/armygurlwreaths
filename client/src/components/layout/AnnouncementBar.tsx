@@ -23,14 +23,14 @@ export default function AnnouncementBar() {
 
   return (
     <div
-      className="py-2 px-4 text-center text-xs font-medium tracking-wide"
+      className="py-2 px-4 text-center text-[10px] sm:text-xs font-medium tracking-wide"
       style={{ backgroundColor: announcement.bgColor, color: announcement.textColor }}
     >
       <span>{announcement.message}</span>
       {announcement.linkText && announcement.linkUrl && (
         <Link
           to={announcement.linkUrl}
-          className="ml-2 underline font-semibold hover:opacity-80 transition-opacity"
+          className="ml-1 sm:ml-2 underline font-semibold hover:opacity-80 transition-opacity"
         >
           {announcement.linkText}
         </Link>

@@ -1,5 +1,5 @@
 import { db } from '../config/db.js';
-import { categories, products, productImages, users, announcements } from './schema/index.js';
+import { categories, products, productImages, productVariants, users, announcements } from './schema/index.js';
 import bcrypt from 'bcryptjs';
 
 async function seed() {
@@ -16,18 +16,19 @@ async function seed() {
   }).onConflictDoNothing();
 
   // Seed categories
-  const [seasonalCat, patrioticCat, customCat, everydayCat] = await db.insert(categories).values([
-    { name: 'Seasonal', slug: 'seasonal', description: 'Beautiful wreaths for every season', sortOrder: 1 },
-    { name: 'Patriotic', slug: 'patriotic', description: 'Honor and pride in every wreath', sortOrder: 2 },
-    { name: 'Custom Orders', slug: 'custom', description: 'Handcrafted to your specifications', sortOrder: 3 },
-    { name: 'Everyday', slug: 'everyday', description: 'Classic wreaths for year-round display', sortOrder: 4 },
+  const [wreathsCat, apparelCat, homeDecorCat, patrioticCat, customCat] = await db.insert(categories).values([
+    { name: 'Wreaths', slug: 'wreaths', description: 'Handcrafted wreaths for every season and occasion', sortOrder: 1 },
+    { name: 'Apparel', slug: 'apparel', description: 'Patriotic & military-inspired shirts, hoodies, and more', sortOrder: 2 },
+    { name: 'Home Decor', slug: 'home-decor', description: 'Signs, accents, and decor to make your house a home', sortOrder: 3 },
+    { name: 'Patriotic', slug: 'patriotic', description: 'Honor and pride in every piece', sortOrder: 4 },
+    { name: 'Custom Orders', slug: 'custom', description: 'Handcrafted to your specifications', sortOrder: 5 },
   ]).onConflictDoNothing().returning();
 
-  // Seed products
-  if (seasonalCat) {
+  // Seed wreath products
+  if (wreathsCat) {
     const insertedProducts = await db.insert(products).values([
       {
-        categoryId: seasonalCat.id,
+        categoryId: wreathsCat.id,
         name: 'Autumn Harvest Wreath',
         slug: 'autumn-harvest-wreath',
         description: 'A stunning 24-inch wreath bursting with the warmth of autumn. Hand-assembled with preserved eucalyptus, dried orange slices, cinnamon sticks, and seasonal blooms in rich amber, burgundy, and gold tones. Each wreath is a one-of-a-kind piece crafted with love.',
@@ -35,36 +36,35 @@ async function seed() {
         compareAtPrice: 11000,
         stockQty: 15,
         isFeatured: true,
-        tags: ['autumn', 'seasonal', 'fall', 'harvest'],
+        tags: ['autumn', 'seasonal', 'fall', 'harvest', 'wreath'],
         season: 'fall',
         metaTitle: 'Autumn Harvest Wreath - Handcrafted Fall Decor | ArmyGurlWreaths',
         metaDescription: 'Hand-assembled 24-inch autumn harvest wreath with preserved eucalyptus, dried orange slices, and seasonal blooms. Limited seasonal availability.',
       },
       {
-        categoryId: seasonalCat.id,
+        categoryId: wreathsCat.id,
         name: 'Winter Wonderland Wreath',
         slug: 'winter-wonderland-wreath',
         description: 'Capture the magic of winter with this 22-inch snow-dusted wreath. Features frosted pine branches, silver berries, pinecones, and a luxurious velvet ribbon bow. Perfect for door or wall display throughout the holiday season.',
         price: 9500,
         stockQty: 20,
         isFeatured: true,
-        tags: ['winter', 'christmas', 'holiday', 'seasonal'],
+        tags: ['winter', 'christmas', 'holiday', 'seasonal', 'wreath'],
         season: 'winter',
       },
       {
-        categoryId: seasonalCat.id,
+        categoryId: wreathsCat.id,
         name: 'Spring Bloom Wreath',
         slug: 'spring-bloom-wreath',
         description: 'Welcome spring with this vibrant 20-inch wreath. Hand-arranged with faux peonies, ranunculus, eucalyptus, and butterfly accents in soft blush, cream, and sage green. Lightweight and UV-resistant for lasting outdoor display.',
         price: 7500,
         stockQty: 25,
-        tags: ['spring', 'floral', 'seasonal'],
+        tags: ['spring', 'floral', 'seasonal', 'wreath'],
         season: 'spring',
       },
     ]).onConflictDoNothing().returning();
 
-    // Placeholder images per seasonal product (primary + secondary for hover-swap)
-    const seasonalImages: Record<string, { primary: string; secondary: string }> = {
+    const wreathImages: Record<string, { primary: string; secondary: string }> = {
       'autumn-harvest-wreath': {
         primary: 'https://placehold.co/800x800/8b7f50/fdfcf7?text=Autumn+Harvest+Wreath',
         secondary: 'https://placehold.co/800x800/b8891e/fdfcf7?text=Autumn+Harvest%0ADetail+View',
@@ -80,9 +80,9 @@ async function seed() {
     };
 
     for (const product of insertedProducts) {
-      const imgs = seasonalImages[product.slug] ?? {
-        primary: 'https://placehold.co/800x800/8b7f50/fdfcf7?text=Seasonal+Wreath',
-        secondary: 'https://placehold.co/800x800/b8891e/fdfcf7?text=Seasonal+Wreath%0ADetail+View',
+      const imgs = wreathImages[product.slug] ?? {
+        primary: 'https://placehold.co/800x800/8b7f50/fdfcf7?text=Wreath',
+        secondary: 'https://placehold.co/800x800/b8891e/fdfcf7?text=Wreath%0ADetail+View',
       };
       await db.insert(productImages).values([
         { productId: product.id, url: imgs.primary, altText: product.name, isPrimary: true, sortOrder: 0 },
@@ -158,9 +158,151 @@ async function seed() {
     }
   }
 
+  // Seed apparel products
+  if (apparelCat) {
+    const apparelProducts = await db.insert(products).values([
+      {
+        categoryId: apparelCat.id,
+        name: 'Army Strong Unisex Hoodie',
+        slug: 'army-strong-unisex-hoodie',
+        description: 'Stay warm and show your pride with this ultra-soft cotton-blend hoodie. Features a bold "Army Strong" design on the front with a small flag on the sleeve. Available in men\'s and women\'s sizing. Preshrunk, machine washable, and built to last.',
+        price: 4500,
+        stockQty: 50,
+        isFeatured: true,
+        tags: ['hoodie', 'army', 'unisex', 'apparel', 'military'],
+        season: 'year-round',
+      },
+      {
+        categoryId: apparelCat.id,
+        name: 'Patriotic Flag Tee',
+        slug: 'patriotic-flag-tee',
+        description: 'A classic crew-neck t-shirt featuring a vintage distressed American flag print. Made from 100% ring-spun cotton for all-day comfort. Perfect for cookouts, rallies, or everyday wear. Unisex fit available in sizes XS–3XL.',
+        price: 2800,
+        stockQty: 75,
+        isFeatured: true,
+        tags: ['tshirt', 'patriotic', 'unisex', 'apparel', 'flag'],
+        season: 'year-round',
+      },
+      {
+        categoryId: apparelCat.id,
+        name: 'Military Mom V-Neck Tee',
+        slug: 'military-mom-vneck-tee',
+        description: 'Designed for the proud military moms who hold down the home front. Soft tri-blend fabric with a relaxed women\'s fit. "Proud Military Mom" script with star detail. Available in multiple colors.',
+        price: 2500,
+        stockQty: 40,
+        tags: ['tshirt', 'women', 'military-mom', 'apparel'],
+        season: 'year-round',
+      },
+      {
+        categoryId: apparelCat.id,
+        name: 'Kids Camo Hero Tee',
+        slug: 'kids-camo-hero-tee',
+        description: 'Let the little ones show their pride too! This soft cotton kids tee features a fun camo heart design with "My Hero Wears Combat Boots." Available in toddler through youth sizes.',
+        price: 1800,
+        stockQty: 60,
+        tags: ['tshirt', 'kids', 'youth', 'apparel', 'camo'],
+        season: 'year-round',
+      },
+    ]).onConflictDoNothing().returning();
+
+    const apparelImages: Record<string, { primary: string; secondary: string }> = {
+      'army-strong-unisex-hoodie': {
+        primary: 'https://placehold.co/800x800/4b5320/fdfcf7?text=Army+Strong%0AHoodie',
+        secondary: 'https://placehold.co/800x800/6b7a2f/fdfcf7?text=Army+Strong%0ABack+View',
+      },
+      'patriotic-flag-tee': {
+        primary: 'https://placehold.co/800x800/c8373a/fdfcf7?text=Patriotic%0AFlag+Tee',
+        secondary: 'https://placehold.co/800x800/1e3a8a/fdfcf7?text=Flag+Tee%0ADetail+View',
+      },
+      'military-mom-vneck-tee': {
+        primary: 'https://placehold.co/800x800/8b7f50/fdfcf7?text=Military+Mom%0AV-Neck',
+        secondary: 'https://placehold.co/800x800/b8891e/fdfcf7?text=Military+Mom%0ADetail+View',
+      },
+      'kids-camo-hero-tee': {
+        primary: 'https://placehold.co/800x800/4a7c59/fdfcf7?text=Kids+Camo%0AHero+Tee',
+        secondary: 'https://placehold.co/800x800/6b9e79/fdfcf7?text=Kids+Camo%0ADetail+View',
+      },
+    };
+
+    for (const product of apparelProducts) {
+      const imgs = apparelImages[product.slug] ?? {
+        primary: 'https://placehold.co/800x800/4b5320/fdfcf7?text=Apparel',
+        secondary: 'https://placehold.co/800x800/6b7a2f/fdfcf7?text=Apparel%0ADetail+View',
+      };
+      await db.insert(productImages).values([
+        { productId: product.id, url: imgs.primary, altText: product.name, isPrimary: true, sortOrder: 0 },
+        { productId: product.id, url: imgs.secondary, altText: `${product.name} — detail view`, isPrimary: false, sortOrder: 1 },
+      ]).onConflictDoNothing();
+    }
+
+    const sizes = ['XS', 'S', 'M', 'L', 'XL', '2XL', '3XL'];
+    for (const product of apparelProducts) {
+      const isHoodie = product.slug.includes('hoodie');
+      const isKids = product.slug.includes('kids');
+      const productSizes = isKids ? ['2T', '3T', '4T', 'YS', 'YM', 'YL', 'YXL'] : sizes;
+      const variantRows = productSizes.map((size) => ({
+        productId: product.id,
+        name: 'Size',
+        value: size,
+        priceAdjustment: (size === '2XL' || size === '3XL') && !isKids ? 300 : 0,
+        stockQty: isHoodie ? 8 : 12,
+      }));
+      await db.insert(productVariants).values(variantRows);
+    }
+  }
+
+  // Seed home decor products
+  if (homeDecorCat) {
+    const homeDecorProducts = await db.insert(products).values([
+      {
+        categoryId: homeDecorCat.id,
+        name: 'Rustic "Home of the Brave" Sign',
+        slug: 'rustic-home-brave-sign',
+        description: 'A beautifully hand-painted wooden sign measuring 18" x 24". Distressed finish with "Home of the Brave" lettering and a subtle flag motif. Perfect for entryways, living rooms, or porches. Comes ready to hang.',
+        price: 4200,
+        stockQty: 20,
+        tags: ['sign', 'home-decor', 'patriotic', 'wood'],
+        season: 'year-round',
+      },
+      {
+        categoryId: homeDecorCat.id,
+        name: 'Patriotic Door Hanger',
+        slug: 'patriotic-door-hanger',
+        description: 'A handcrafted round wooden door hanger featuring red, white, and blue floral accents and a burlap bow. 16 inches in diameter — a beautiful alternative to a wreath that makes a statement.',
+        price: 3500,
+        stockQty: 25,
+        isFeatured: true,
+        tags: ['door-hanger', 'home-decor', 'patriotic'],
+        season: 'year-round',
+      },
+    ]).onConflictDoNothing().returning();
+
+    const homeDecorImages: Record<string, { primary: string; secondary: string }> = {
+      'rustic-home-brave-sign': {
+        primary: 'https://placehold.co/800x800/8b7f50/fdfcf7?text=Home+of%0Athe+Brave+Sign',
+        secondary: 'https://placehold.co/800x800/b8891e/fdfcf7?text=Brave+Sign%0ADetail+View',
+      },
+      'patriotic-door-hanger': {
+        primary: 'https://placehold.co/800x800/c8373a/fdfcf7?text=Patriotic%0ADoor+Hanger',
+        secondary: 'https://placehold.co/800x800/1e3a8a/fdfcf7?text=Door+Hanger%0ADetail+View',
+      },
+    };
+
+    for (const product of homeDecorProducts) {
+      const imgs = homeDecorImages[product.slug] ?? {
+        primary: 'https://placehold.co/800x800/8b7f50/fdfcf7?text=Home+Decor',
+        secondary: 'https://placehold.co/800x800/b8891e/fdfcf7?text=Home+Decor%0ADetail+View',
+      };
+      await db.insert(productImages).values([
+        { productId: product.id, url: imgs.primary, altText: product.name, isPrimary: true, sortOrder: 0 },
+        { productId: product.id, url: imgs.secondary, altText: `${product.name} — detail view`, isPrimary: false, sortOrder: 1 },
+      ]).onConflictDoNothing();
+    }
+  }
+
   // Seed announcement
   await db.insert(announcements).values({
-    message: '🎖️ Free shipping on orders over $75 | Use code MILITARYSTRONG for 15% off patriotic collection',
+    message: '🎖️ Free shipping on orders over $75 | Use code MILITARYSTRONG for 15% off patriotic items',
     linkText: 'Shop Now',
     linkUrl: '/shop/patriotic',
     bgColor: '#8b7f50',

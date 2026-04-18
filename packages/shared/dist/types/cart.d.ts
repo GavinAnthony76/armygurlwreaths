@@ -1,4 +1,4 @@
-import type { Product, ProductVariant } from './product';
+import type { Product, ProductVariant } from './product.js';
 export interface CartItem {
     id: string;
     productId: string;

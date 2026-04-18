@@ -1,0 +1,57 @@
+modules = ["nodejs-20", "web"]
+[agent]
+expertMode = true
+
+[nix]
+channel = "stable-25_05"
+
+[userenv]
+
+[userenv.shared]
+NODE_ENV = "development"
+PORT = "3001"
+CLIENT_URL = "http://localhost:5000"
+API_URL = "http://localhost:3001"
+JWT_ACCESS_EXPIRES_IN = "15m"
+JWT_REFRESH_EXPIRES_IN = "7d"
+PAYPAL_MODE = "sandbox"
+RATE_LIMIT_WINDOW_MS = "900000"
+RATE_LIMIT_MAX = "100"
+EMAIL_FROM = "orders@armygurlwreaths.com"
+EMAIL_FROM_NAME = "ArmyGurlWreaths"
+
+[workflows]
+runButton = "Project"
+
+[[workflows.workflow]]
+name = "Project"
+mode = "parallel"
+author = "agent"
+
+[[workflows.workflow.tasks]]
+task = "workflow.run"
+args = "Start application"
+
+[[workflows.workflow]]
+name = "Start application"
+author = "agent"
+
+[[workflows.workflow.tasks]]
+task = "shell.exec"
+args = "npm run dev"
+waitForPort = 5000
+
+[workflows.workflow.metadata]
+outputType = "webview"
+
+[[ports]]
+localPort = 3001
+externalPort = 3001
+
+[[ports]]
+localPort = 5000
+externalPort = 80
+
+[[ports]]
+localPort = 5001
+externalPort = 3002

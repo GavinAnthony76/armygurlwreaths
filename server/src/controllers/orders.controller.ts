@@ -8,7 +8,17 @@ export const ordersController = {
   },
 
   async getOrder(req: Request, res: Response) {
-    const order = await orderService.getById(req.params.id, req.user!.sub);
+    const id = req.params.id;
+    const isUuid = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(id);
+    const isPaymentIntent = id.startsWith('pi_') || id.startsWith('demo_');
+    let order;
+    if (isUuid) {
+      order = await orderService.getById(id, req.user!.sub);
+    } else if (isPaymentIntent) {
+      order = await orderService.getByPaymentIntentId(id, req.user!.sub);
+    } else {
+      order = await orderService.getByOrderNumber(id, req.user!.sub);
+    }
     res.json({ success: true, data: order });
   },
 

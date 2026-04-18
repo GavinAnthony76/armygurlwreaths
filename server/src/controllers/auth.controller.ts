@@ -7,6 +7,7 @@ const cookieOptions = {
   httpOnly: true,
   secure: env.NODE_ENV === 'production',
   sameSite: 'lax' as const,
+  path: '/',
   domain: env.COOKIE_DOMAIN,
   maxAge: 7 * 24 * 60 * 60 * 1000,
 };
@@ -37,7 +38,13 @@ export const authController = {
   },
 
   async logout(_req: Request, res: Response) {
-    res.clearCookie(REFRESH_COOKIE, { domain: env.COOKIE_DOMAIN });
+    res.clearCookie(REFRESH_COOKIE, {
+      httpOnly: true,
+      secure: env.NODE_ENV === 'production',
+      sameSite: 'lax' as const,
+      path: '/',
+      domain: env.COOKIE_DOMAIN,
+    });
     res.json({ success: true, message: 'Logged out successfully' });
   },
 
@@ -61,7 +68,8 @@ export const authController = {
   },
 
   async updateMe(req: Request, res: Response) {
-    const updated = await authService.updateProfile(req.user!.sub, req.body);
+    const { firstName, lastName, phone } = req.body;
+    const updated = await authService.updateProfile(req.user!.sub, { firstName, lastName, phone });
     res.json({ success: true, data: sanitizeUser(updated) });
   },
 };

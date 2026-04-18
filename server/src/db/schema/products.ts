@@ -1,5 +1,5 @@
 import { pgTable, text, timestamp, uuid, integer, boolean } from 'drizzle-orm/pg-core';
-import { relations } from 'drizzle-orm';
+import { relations, sql } from 'drizzle-orm';
 import { categories } from './categories.js';
 
 export const products = pgTable('products', {
@@ -16,7 +16,7 @@ export const products = pgTable('products', {
   isActive: boolean('is_active').default(true).notNull(),
   isFeatured: boolean('is_featured').default(false).notNull(),
   isCustomizable: boolean('is_customizable').default(false).notNull(),
-  tags: text('tags').array().default([]).notNull(),
+  tags: text('tags').array().default(sql`ARRAY[]::text[]`).notNull(),
   season: text('season', { enum: ['spring', 'summer', 'fall', 'winter', 'year-round'] }),
   metaTitle: text('meta_title'),
   metaDescription: text('meta_description'),
